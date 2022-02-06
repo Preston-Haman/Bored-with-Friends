@@ -1,8 +1,8 @@
 namespace BoredWithFriends
 {
-	public partial class formInitialLauncher : Form
+	public partial class FrmInitialLauncher : Form
 	{
-		public formInitialLauncher()
+		public FrmInitialLauncher()
 		{
 			InitializeComponent();
 		}
@@ -10,12 +10,13 @@ namespace BoredWithFriends
         private void btnLocalGameLaunch_Click(object sender, EventArgs e)
         {
 			//Prompt user yes or no to login
-			DialogResult dialogResult = MessageBox.Show("Would you like to login to track\n your game stats?", "Login Prompt", MessageBoxButtons.YesNo);
+			DialogResult dialogResult = MessageBox.Show("   Would you like to login to track \n " + 
+														"            your game stats?", "Login Prompt", MessageBoxButtons.YesNo);
 			if (dialogResult == DialogResult.Yes)
 			{
 				//create and open a login form
-				LoginForm NewLoginForm = new();
-				NewLoginForm.ShowDialog();
+				FrmLogin loginForm = new();
+				loginForm.ShowDialog();
 			}
 			else if (dialogResult == DialogResult.No)
 			{

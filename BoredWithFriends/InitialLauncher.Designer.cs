@@ -1,6 +1,6 @@
 ﻿namespace BoredWithFriends
 {
-	partial class formInitialLauncher
+	partial class FrmInitialLauncher
 	{
 		/// <summary>
 		///  Required designer variable.
@@ -53,9 +53,9 @@
             this.label1.ForeColor = System.Drawing.SystemColors.ActiveCaption;
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(502, 66);
+            this.label1.Size = new System.Drawing.Size(495, 66);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Bored With Friends";
+            this.label1.Text = "Bored with Friends";
             // 
             // btnMultiplayerGameLaunch
             // 
@@ -70,7 +70,7 @@
             this.btnMultiplayerGameLaunch.Text = "Online\r\nMultiplayer\r\n";
             this.btnMultiplayerGameLaunch.UseVisualStyleBackColor = false;
             // 
-            // formInitialLauncher
+            // FrmInitialLauncher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -80,8 +80,8 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnLocalGameLaunch);
             this.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.Name = "formInitialLauncher";
-            this.Text = "Form1";
+            this.Name = "FrmInitialLauncher";
+            this.Text = "Launcher";
             this.ResumeLayout(false);
             this.PerformLayout();
 
