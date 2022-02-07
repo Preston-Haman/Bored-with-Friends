@@ -1,4 +1,4 @@
-﻿namespace BoredWithFriends
+﻿namespace BoredWithFriends.Forms
 {
     partial class FrmLogin
     {

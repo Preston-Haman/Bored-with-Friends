@@ -1,3 +1,5 @@
+using BoredWithFriends.Forms;
+
 namespace BoredWithFriends
 {
 	internal static class Program
