@@ -1,7 +1,7 @@
 ﻿## Bored with Friends
 Bored with Friends is a game launcher that currently contains a game called Match Four. In this classic game 
 you take turns sliding your game piece down a slotted table. The first player to match four of their pieces
-vertically, horizantally, or diagonal wins. You can play hot seat with your friends and can track your win/loss ratios.
+vertically, horizantally, or diagonally wins. You can play hot seat with your friends and can track your win/loss ratios.
 
 ## Possible Features to Add
 - More Games
