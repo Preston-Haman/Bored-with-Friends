@@ -17,6 +17,3 @@ vertically, horizantally, or diagonally wins. You can play hot seat with your fr
 - [Getting Started with Entity Framework 6](https://www.entityframeworktutorial.net/entityframework6/introduction.aspx)
 
 ## Screen Shots (coming soon)
-
-
-
