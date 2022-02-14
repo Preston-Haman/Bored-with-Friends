@@ -25,7 +25,19 @@ namespace BoredWithFriends.Forms
 
 		private void btnCreateAccount_Click(object sender, EventArgs e)
 		{
+			string userName = txtUserName.Text;
+			string password = txtPassword.Text;
+			string confirmPassword = txtConfirmPassword.Text;
 
-		}
+			if (password.Equals(confirmPassword))
+			{
+				PlayerLogin newUser = new PlayerLogin()
+				{
+					UserName = userName;
+			}
+
+			Data.DatabaseContext.Add()
+			}
+	}
 	}
 }
