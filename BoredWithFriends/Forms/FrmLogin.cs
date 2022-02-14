@@ -5,6 +5,7 @@
 		public FrmLogin()
 		{
 			InitializeComponent();
+			this.ApplyGeneralTheme();
 		}
 
 		private void btnBackToInitialLauncher_Click(object sender, EventArgs e)

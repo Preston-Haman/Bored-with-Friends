@@ -5,6 +5,7 @@ namespace BoredWithFriends.Forms
 		public FrmInitialLauncher()
 		{
 			InitializeComponent();
+			this.ApplyGeneralTheme();
 		}
 
 		private void btnLocalGameLaunch_Click(object sender, EventArgs e)
