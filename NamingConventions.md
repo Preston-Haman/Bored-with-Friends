@@ -50,7 +50,7 @@ We will be using ==Allman Indentation Style== *(tabbing not represented in table
 |               |               | `{` 
 |               |               | `public event EventHandler Exited;` 
 |               |               | `}`
-| Field         | Camel         | `public class messageQueue` 
+| Field         | Camel         | `public class MessageQueue` 
 |               |               | `{` 
 |               |               | `public static readonly timeSpan`
 |               |               | `InfiniteTimeout;` 
