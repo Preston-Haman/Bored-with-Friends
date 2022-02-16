@@ -23,6 +23,7 @@ _______________
 | Constants       | UPPER_SNAKE   | `public const MIN = 0;`
 | Enum value      | Pascal        | `public enum FileMode { Append ... }`
 | Parameter       | Camel         | `public static int ToInt32(string value);`
+| Variable        | Camel         | `int indexToChange = 0;`
 
 _______________
 ## Windows Forms Prefixes
