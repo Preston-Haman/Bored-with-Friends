@@ -1,4 +1,5 @@
 ﻿using BoredWithFriends.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,15 +30,54 @@ namespace BoredWithFriends.Forms
 			string password = txtPassword.Text;
 			string confirmPassword = txtConfirmPassword.Text;
 
-			if (password.Equals(confirmPassword))
-			{
-				PlayerLogin newUser = new PlayerLogin()
+			if (!password.Equals(confirmPassword) || !isValidName(userName)){
+				if (!password.Equals(confirmPassword))
 				{
-					UserName = userName;
+					MessageBox.Show("password mismatch");
+				}
+				if (!isValidName(userName))
+				{
+					MessageBox.Show("not valid username");
+				}
 			}
+			else
+			{
+				PlayerLogin newUser = new()
+				{
+					UserName = userName,	
+					Password = password,
+				};
 
-			Data.DatabaseContext.Add()
+				//Data.DatabaseContext.Add(newUser);
 			}
-	}
+		}
+
+		private static bool isValidName(string userName)
+		{
+			if (string.IsNullOrWhiteSpace(userName))
+			{
+				return false;
+			}
+			if (NameExists(userName))
+			{
+				return false;
+			}
+			return true;
+		}
+
+		private static bool NameExists(string userName)
+		{
+			Data.DatabaseContext dataBase = new();
+			var name = from logins in dataBase.PlayerLogins
+					   where logins.UserName.Contains(userName)
+					   select logins;
+			if (name != null)
+			{
+				return true;
+			}
+			return false;
+			//return dataBase.PlayerLogins.Contains<PlayerLogin>(PlayerLogin userName, userName)
+		}
+
 	}
 }
