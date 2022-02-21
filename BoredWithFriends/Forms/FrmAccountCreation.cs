@@ -68,14 +68,15 @@ namespace BoredWithFriends.Forms
 		private static bool NameExists(string userName)
 		{
 			Data.DatabaseContext dataBase = new();
-			var name = from logins in dataBase.PlayerLogins
-					   where logins.UserName.Contains(userName)
-					   select logins;
-			if (name != null)
+			PlayerLogin ? nameSearch = (from logins in dataBase.PlayerLogins
+								   where logins.UserName == userName
+								   select logins).SingleOrDefault();
+			//object? login = null;
+			if (nameSearch is null)
 			{
-				return true;
+				return false;
 			}
-			return false;
+			return true;
 			//return dataBase.PlayerLogins.Contains<PlayerLogin>(PlayerLogin userName, userName)
 		}
 

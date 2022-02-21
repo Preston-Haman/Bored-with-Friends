@@ -48,7 +48,7 @@
             this.btnBackToLogin.Location = new System.Drawing.Point(27, 223);
             this.btnBackToLogin.Name = "btnBackToLogin";
             this.btnBackToLogin.Size = new System.Drawing.Size(75, 37);
-            this.btnBackToLogin.TabIndex = 16;
+            this.btnBackToLogin.TabIndex = 5;
             this.btnBackToLogin.Text = "Back";
             this.btnBackToLogin.UseVisualStyleBackColor = false;
             this.btnBackToLogin.Click += new System.EventHandler(this.btnBackToLogin_Click);
@@ -58,7 +58,7 @@
             this.txtPassword.Location = new System.Drawing.Point(172, 107);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.Size = new System.Drawing.Size(242, 27);
-            this.txtPassword.TabIndex = 14;
+            this.txtPassword.TabIndex = 1;
             // 
             // label3
             // 
@@ -92,7 +92,7 @@
             this.btnCreateAccount.Location = new System.Drawing.Point(318, 194);
             this.btnCreateAccount.Name = "btnCreateAccount";
             this.btnCreateAccount.Size = new System.Drawing.Size(130, 66);
-            this.btnCreateAccount.TabIndex = 11;
+            this.btnCreateAccount.TabIndex = 4;
             this.btnCreateAccount.Text = "Create New User";
             this.btnCreateAccount.UseVisualStyleBackColor = false;
             this.btnCreateAccount.Click += new System.EventHandler(this.btnCreateAccount_Click);
@@ -102,7 +102,7 @@
             this.txtUserName.Location = new System.Drawing.Point(172, 63);
             this.txtUserName.Name = "txtUserName";
             this.txtUserName.Size = new System.Drawing.Size(242, 27);
-            this.txtUserName.TabIndex = 10;
+            this.txtUserName.TabIndex = 0;
             // 
             // label1
             // 
@@ -121,7 +121,7 @@
             this.txtConfirmPassword.Location = new System.Drawing.Point(172, 152);
             this.txtConfirmPassword.Name = "txtConfirmPassword";
             this.txtConfirmPassword.Size = new System.Drawing.Size(242, 27);
-            this.txtConfirmPassword.TabIndex = 18;
+            this.txtConfirmPassword.TabIndex = 3;
             // 
             // label4
             // 
