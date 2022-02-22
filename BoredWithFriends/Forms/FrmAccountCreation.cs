@@ -31,17 +31,23 @@ namespace BoredWithFriends.Forms
 			string password = txtPassword.Text;
 			string confirmPassword = txtConfirmPassword.Text;
 
-			if (!password.Equals(confirmPassword) || !isValidName(userName)){
-				if (!password.Equals(confirmPassword))
-				{
-					MessageBox.Show("password mismatch");
-				}
-				if (!isValidName(userName))
-				{
-					MessageBox.Show("not valid username");
-				}
+			bool nameTaken = NameExists(userName);
+			bool nameBlank = string.IsNullOrEmpty(userName);
+			bool passwordsMatch = password.Equals(confirmPassword);
+
+			if (nameTaken)
+			{
+				MessageBox.Show("This username has been taken");
 			}
-			else
+			if (nameBlank)
+				{
+					MessageBox.Show("Username cannot be blank");
+				}
+			if (!passwordsMatch)
+			{
+				MessageBox.Show("Passwords do not match");
+			}
+			if (!nameTaken && !nameBlank && passwordsMatch)
 			{
 				PlayerLogin newUser = new()
 				{
@@ -53,19 +59,6 @@ namespace BoredWithFriends.Forms
 				database.Add(newUser);
 				database.SaveChanges();
 			}
-		}
-
-		private static bool isValidName(string userName)
-		{
-			if (string.IsNullOrWhiteSpace(userName))
-			{
-				return false;
-			}
-			if (NameExists(userName))
-			{
-				return false;
-			}
-			return true;
 		}
 		/// <summary>
 		/// Checks if a user name exists in the database
