@@ -1,9 +1,9 @@
-﻿using BoredWithFriends.Models;
+﻿using BoredWithFriends.Data;
+using BoredWithFriends.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -67,8 +67,8 @@ namespace BoredWithFriends.Forms
 
 		private static bool NameExists(string userName)
 		{
-			Data.DatabaseContext dataBase = new();
-			PlayerLogin ? nameSearch = (from logins in dataBase.PlayerLogins
+			DatabaseContext database = new();
+			PlayerLogin ? nameSearch = (from logins in database.PlayerLogins
 								   where logins.UserName == userName
 								   select logins).SingleOrDefault();
 			//object? login = null;
@@ -77,6 +77,7 @@ namespace BoredWithFriends.Forms
 				return false;
 			}
 			return true;
+			//TODO: change color of FrmAccountCreation
 			//return dataBase.PlayerLogins.Contains<PlayerLogin>(PlayerLogin userName, userName)
 		}
 
