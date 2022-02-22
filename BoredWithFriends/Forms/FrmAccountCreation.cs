@@ -14,6 +14,7 @@ namespace BoredWithFriends.Forms
 {
 	public partial class FrmAccountCreation : Form
 	{
+
 		public FrmAccountCreation()
 		{
 			InitializeComponent();
@@ -48,7 +49,9 @@ namespace BoredWithFriends.Forms
 					Password = password,
 				};
 
-				//Data.DatabaseContext.Add(newUser);
+				DatabaseContext database = new();
+				database.Add(newUser);
+				database.SaveChanges();
 			}
 		}
 
@@ -64,10 +67,15 @@ namespace BoredWithFriends.Forms
 			}
 			return true;
 		}
-
+		/// <summary>
+		/// Checks if a user name exists in the database
+		/// </summary>
+		/// <param name="userName"></param>
+		/// <returns></returns>
 		private static bool NameExists(string userName)
 		{
 			DatabaseContext database = new();
+
 			PlayerLogin ? nameSearch = (from logins in database.PlayerLogins
 								   where logins.UserName == userName
 								   select logins).SingleOrDefault();
@@ -77,8 +85,6 @@ namespace BoredWithFriends.Forms
 				return false;
 			}
 			return true;
-			//TODO: change color of FrmAccountCreation
-			//return dataBase.PlayerLogins.Contains<PlayerLogin>(PlayerLogin userName, userName)
 		}
 
 	}
