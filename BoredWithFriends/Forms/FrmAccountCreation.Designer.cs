@@ -41,7 +41,7 @@
             // 
             // btnBackToLogin
             // 
-            this.btnBackToLogin.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnBackToLogin.BackColor = System.Drawing.SystemColors.Control;
             this.btnBackToLogin.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnBackToLogin.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.btnBackToLogin.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -64,7 +64,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Sigmar One", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label3.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label3.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.label3.Location = new System.Drawing.Point(29, 102);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(137, 33);
@@ -76,7 +76,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Sigmar One", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label2.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label2.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label2.Location = new System.Drawing.Point(24, 58);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(142, 33);
@@ -86,7 +86,7 @@
             // 
             // btnCreateAccount
             // 
-            this.btnCreateAccount.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnCreateAccount.BackColor = System.Drawing.SystemColors.Control;
             this.btnCreateAccount.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCreateAccount.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.btnCreateAccount.Location = new System.Drawing.Point(318, 194);
@@ -107,11 +107,11 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label1.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label1.Font = new System.Drawing.Font("Sigmar One", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label1.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label1.Location = new System.Drawing.Point(36, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(400, 46);
+            this.label1.Size = new System.Drawing.Size(474, 56);
             this.label1.TabIndex = 9;
             this.label1.Text = "Enter your desired user name and password\r\nthen click create new user";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -127,7 +127,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Sigmar One", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label4.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label4.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label4.Location = new System.Drawing.Point(36, 137);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(137, 66);
@@ -139,7 +139,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.DimGray;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(522, 283);
             this.Controls.Add(this.txtConfirmPassword);
             this.Controls.Add(this.label4);

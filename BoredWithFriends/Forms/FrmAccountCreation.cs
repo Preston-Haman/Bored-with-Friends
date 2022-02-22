@@ -18,6 +18,7 @@ namespace BoredWithFriends.Forms
 		public FrmAccountCreation()
 		{
 			InitializeComponent();
+			this.ApplyGeneralTheme();
 		}
 
 		private void btnBackToLogin_Click(object sender, EventArgs e)
