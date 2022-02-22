@@ -31,27 +31,11 @@ namespace BoredWithFriends.Forms
 			string password = txtPassword.Text;
 			string confirmPassword = txtConfirmPassword.Text;
 
-			bool nameTaken = NameExists(userName);
-			bool nameBlank = string.IsNullOrEmpty(userName);
-			bool passwordsMatch = password.Equals(confirmPassword);
-
-			if (nameTaken)
-			{
-				MessageBox.Show("This username has been taken");
-			}
-			if (nameBlank)
-				{
-					MessageBox.Show("Username cannot be blank");
-				}
-			if (!passwordsMatch)
-			{
-				MessageBox.Show("Passwords do not match");
-			}
-			if (!nameTaken && !nameBlank && passwordsMatch)
+			if (IsValidLogin(userName, password, confirmPassword))
 			{
 				PlayerLogin newUser = new()
 				{
-					UserName = userName,	
+					UserName = userName,
 					Password = password,
 				};
 
@@ -60,11 +44,33 @@ namespace BoredWithFriends.Forms
 				database.SaveChanges();
 			}
 		}
+
+		private bool IsValidLogin(string userName, string password, string confirmPassword)
+		{
+			bool nameBlank = string.IsNullOrEmpty(userName);
+			bool nameTaken = NameExists(userName);
+			bool passwordsMatch = password.Equals(confirmPassword);
+
+			if (nameTaken)
+			{
+				MessageBox.Show("This username has been taken");
+			}
+			if (nameBlank)
+			{
+				MessageBox.Show("Username cannot be blank");
+			}
+			if (!passwordsMatch)
+			{
+				MessageBox.Show("Passwords do not match");
+			}
+			return true;
+		}
+
 		/// <summary>
 		/// Checks if a user name exists in the database
 		/// </summary>
-		/// <param name="userName"></param>
-		/// <returns></returns>
+		/// <param name="userName">The user name to search for</param>
+		/// <returns>True if found</returns>
 		private static bool NameExists(string userName)
 		{
 			DatabaseContext database = new();
@@ -72,7 +78,7 @@ namespace BoredWithFriends.Forms
 			PlayerLogin ? nameSearch = (from logins in database.PlayerLogins
 								   where logins.UserName == userName
 								   select logins).SingleOrDefault();
-			//object? login = null;
+
 			if (nameSearch is null)
 			{
 				return false;
