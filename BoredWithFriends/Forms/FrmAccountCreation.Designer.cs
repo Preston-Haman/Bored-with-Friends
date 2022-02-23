@@ -37,6 +37,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.txtConfirmPassword = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.lblWarningInvalidName = new System.Windows.Forms.Label();
+            this.lblWarningInvalidPassword = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnBackToLogin
@@ -55,8 +57,9 @@
             // 
             // txtPassword
             // 
-            this.txtPassword.Location = new System.Drawing.Point(172, 107);
+            this.txtPassword.Location = new System.Drawing.Point(163, 113);
             this.txtPassword.Name = "txtPassword";
+            this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(242, 27);
             this.txtPassword.TabIndex = 1;
             // 
@@ -65,7 +68,7 @@
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Sigmar One", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label3.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label3.Location = new System.Drawing.Point(29, 102);
+            this.label3.Location = new System.Drawing.Point(20, 113);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(137, 33);
             this.label3.TabIndex = 13;
@@ -77,7 +80,7 @@
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Sigmar One", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label2.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label2.Location = new System.Drawing.Point(24, 58);
+            this.label2.Location = new System.Drawing.Point(15, 58);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(142, 33);
             this.label2.TabIndex = 12;
@@ -89,7 +92,7 @@
             this.btnCreateAccount.BackColor = System.Drawing.SystemColors.Control;
             this.btnCreateAccount.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCreateAccount.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btnCreateAccount.Location = new System.Drawing.Point(318, 194);
+            this.btnCreateAccount.Location = new System.Drawing.Point(302, 201);
             this.btnCreateAccount.Name = "btnCreateAccount";
             this.btnCreateAccount.Size = new System.Drawing.Size(130, 66);
             this.btnCreateAccount.TabIndex = 4;
@@ -99,7 +102,7 @@
             // 
             // txtUserName
             // 
-            this.txtUserName.Location = new System.Drawing.Point(172, 63);
+            this.txtUserName.Location = new System.Drawing.Point(163, 63);
             this.txtUserName.Name = "txtUserName";
             this.txtUserName.Size = new System.Drawing.Size(242, 27);
             this.txtUserName.TabIndex = 0;
@@ -118,8 +121,9 @@
             // 
             // txtConfirmPassword
             // 
-            this.txtConfirmPassword.Location = new System.Drawing.Point(172, 152);
+            this.txtConfirmPassword.Location = new System.Drawing.Point(163, 168);
             this.txtConfirmPassword.Name = "txtConfirmPassword";
+            this.txtConfirmPassword.PasswordChar = '*';
             this.txtConfirmPassword.Size = new System.Drawing.Size(242, 27);
             this.txtConfirmPassword.TabIndex = 3;
             // 
@@ -128,12 +132,30 @@
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Sigmar One", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label4.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label4.Location = new System.Drawing.Point(36, 137);
+            this.label4.Location = new System.Drawing.Point(20, 145);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(137, 66);
             this.label4.TabIndex = 17;
             this.label4.Text = "Confirm \r\nPassword";
             this.label4.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // lblWarningInvalidName
+            // 
+            this.lblWarningInvalidName.AutoSize = true;
+            this.lblWarningInvalidName.ForeColor = System.Drawing.Color.Red;
+            this.lblWarningInvalidName.Location = new System.Drawing.Point(163, 93);
+            this.lblWarningInvalidName.Name = "lblWarningInvalidName";
+            this.lblWarningInvalidName.Size = new System.Drawing.Size(0, 20);
+            this.lblWarningInvalidName.TabIndex = 18;
+            // 
+            // lblWarningInvalidPassword
+            // 
+            this.lblWarningInvalidPassword.AutoSize = true;
+            this.lblWarningInvalidPassword.ForeColor = System.Drawing.Color.Red;
+            this.lblWarningInvalidPassword.Location = new System.Drawing.Point(163, 145);
+            this.lblWarningInvalidPassword.Name = "lblWarningInvalidPassword";
+            this.lblWarningInvalidPassword.Size = new System.Drawing.Size(0, 20);
+            this.lblWarningInvalidPassword.TabIndex = 19;
             // 
             // FrmAccountCreation
             // 
@@ -141,6 +163,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(522, 283);
+            this.Controls.Add(this.lblWarningInvalidPassword);
+            this.Controls.Add(this.lblWarningInvalidName);
             this.Controls.Add(this.txtConfirmPassword);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.btnBackToLogin);
@@ -169,5 +193,7 @@
 		private Label label1;
 		private TextBox txtConfirmPassword;
 		private Label label4;
+		private Label lblWarningInvalidName;
+		private Label lblWarningInvalidPassword;
 	}
 }

@@ -34,6 +34,7 @@ namespace BoredWithFriends.Forms
 
 			if (IsValidLogin(userName, password, confirmPassword))
 			{
+
 				PlayerLogin newUser = new()
 				{
 					UserName = userName,
@@ -45,24 +46,39 @@ namespace BoredWithFriends.Forms
 				database.SaveChanges();
 			}
 		}
-
+		/// <summary>
+		/// Checks if a user name and password is valid to be entered into datbase
+		/// </summary>
+		/// <param name="userName">Username for login to insert to database</param>
+		/// <param name="password">Password for login to insert to database</param>
+		/// <param name="confirmPassword">Confirmation of password to ensure it is the one desired</param>
+		/// <returns></returns>
 		private bool IsValidLogin(string userName, string password, string confirmPassword)
 		{
 			bool nameBlank = string.IsNullOrEmpty(userName);
 			bool nameTaken = NameExists(userName);
+			bool passwordBlank = string.IsNullOrEmpty(password);
 			bool passwordsMatch = password.Equals(confirmPassword);
 
-			if (nameTaken)
-			{
-				MessageBox.Show("This username has been taken");
-			}
 			if (nameBlank)
 			{
-				MessageBox.Show("Username cannot be blank");
+				lblWarningInvalidName.Text = "Username cannot be blank";
+				return false;
+			}
+			if (nameTaken)
+			{
+				lblWarningInvalidName.Text = "This username has been taken";
+				return false;
+			}
+			if (passwordBlank)
+			{
+				lblWarningInvalidPassword.Text = "Password cannot be blank";
+				return false;
 			}
 			if (!passwordsMatch)
 			{
-				MessageBox.Show("Passwords do not match");
+				lblWarningInvalidPassword.Text = "Passwords do not match";
+				return false;
 			}
 			return true;
 		}
