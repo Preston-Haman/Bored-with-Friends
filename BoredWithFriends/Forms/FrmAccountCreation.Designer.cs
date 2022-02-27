@@ -112,11 +112,11 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Sigmar One", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label1.Location = new System.Drawing.Point(36, 9);
+            this.label1.Location = new System.Drawing.Point(45, 2);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(474, 56);
+            this.label1.Size = new System.Drawing.Size(427, 56);
             this.label1.TabIndex = 9;
-            this.label1.Text = "Enter your desired user name and password\r\nthen click create new user";
+            this.label1.Text = "Please enter a user name and password\r\nthen click create new user\r\n";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // txtConfirmPassword

@@ -44,6 +44,10 @@ namespace BoredWithFriends.Forms
 				DatabaseContext database = new();
 				database.Add(newUser);
 				database.SaveChanges();
+
+				Close();
+				FrmAccountConfirmation ConfirmNotice = new();
+				ConfirmNotice.ShowDialog();
 			}
 		}
 		/// <summary>
