@@ -57,6 +57,7 @@
             // 
             // btnOk
             // 
+            this.btnOk.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnOk.Location = new System.Drawing.Point(97, 102);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(123, 29);
@@ -67,6 +68,7 @@
             // 
             // FrmAccountConfirmation
             // 
+            this.AcceptButton = this.btnOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(419, 143);
