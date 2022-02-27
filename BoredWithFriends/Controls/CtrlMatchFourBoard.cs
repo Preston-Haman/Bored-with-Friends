@@ -20,7 +20,7 @@ namespace BoredWithFriends.Controls
 
 		public MatchFourGameState GameState { get; private set; }
 
-		public CtrlMatchFourBoard() : this(null!)
+		public CtrlMatchFourBoard() : this(new MatchFourGameState(6, 7))
 		{
 			//Nothing to do; this is for the designer mostly.
 		}
