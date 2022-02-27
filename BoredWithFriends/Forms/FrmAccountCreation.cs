@@ -92,7 +92,7 @@ namespace BoredWithFriends.Forms
 		{
 			DatabaseContext database = new();
 
-			PlayerLogin ? nameSearch = (from logins in database.PlayerLogins
+			PlayerLogin? nameSearch = (from logins in database.PlayerLogins
 								   where logins.UserName == userName
 								   select logins).SingleOrDefault();
 
