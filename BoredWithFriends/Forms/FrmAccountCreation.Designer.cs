@@ -44,7 +44,7 @@
             // btnBackToLogin
             // 
             this.btnBackToLogin.BackColor = System.Drawing.SystemColors.Control;
-            this.btnBackToLogin.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnBackToLogin.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnBackToLogin.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.btnBackToLogin.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnBackToLogin.Location = new System.Drawing.Point(20, 267);
@@ -90,7 +90,7 @@
             // btnCreateAccount
             // 
             this.btnCreateAccount.BackColor = System.Drawing.SystemColors.Control;
-            this.btnCreateAccount.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCreateAccount.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnCreateAccount.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.btnCreateAccount.Location = new System.Drawing.Point(302, 238);
             this.btnCreateAccount.Name = "btnCreateAccount";
