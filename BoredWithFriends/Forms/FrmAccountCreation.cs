@@ -71,7 +71,7 @@ namespace BoredWithFriends.Forms
 			{
 				lblWarningInvalidName.Text = "Username cannot be blank";				
 			}
-			if (nameTaken)
+			else if (nameTaken)
 			{
 				lblWarningInvalidName.Text = "This username has been taken";
 			}
@@ -79,7 +79,7 @@ namespace BoredWithFriends.Forms
 			{
 				lblWarningInvalidPassword.Text = "Password cannot be blank";
 			}
-			if (!passwordsMatch)
+			else if (!passwordsMatch)
 			{
 				lblWarningInvalidPassword.Text = "Passwords do not match";
 			}
