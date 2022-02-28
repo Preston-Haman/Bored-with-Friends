@@ -14,5 +14,10 @@ namespace BoredWithFriends.Forms
 			FrmAccountCreation AccountCreationForm = new();
 			AccountCreationForm.ShowDialog();
 		}
+
+		private void btnExit_Click(object sender, EventArgs e)
+		{
+			Close();
+		}
 	}
 }
