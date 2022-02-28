@@ -111,7 +111,7 @@
             // 
             this.lblPlayOffline.AutoSize = true;
             this.lblPlayOffline.Font = new System.Drawing.Font("Sigmar One", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.lblPlayOffline.Location = new System.Drawing.Point(80, 313);
+            this.lblPlayOffline.Location = new System.Drawing.Point(104, 313);
             this.lblPlayOffline.Name = "lblPlayOffline";
             this.lblPlayOffline.Size = new System.Drawing.Size(279, 56);
             this.lblPlayOffline.TabIndex = 8;
@@ -167,7 +167,7 @@
             // 
             // btnGuest
             // 
-            this.btnGuest.Location = new System.Drawing.Point(376, 340);
+            this.btnGuest.Location = new System.Drawing.Point(400, 340);
             this.btnGuest.Name = "btnGuest";
             this.btnGuest.Size = new System.Drawing.Size(104, 29);
             this.btnGuest.TabIndex = 15;
@@ -176,7 +176,7 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(12, 386);
+            this.btnExit.Location = new System.Drawing.Point(20, 340);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(62, 29);
             this.btnExit.TabIndex = 16;
@@ -187,7 +187,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(531, 427);
+            this.ClientSize = new System.Drawing.Size(531, 401);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnGuest);
             this.Controls.Add(this.txtPassword);
