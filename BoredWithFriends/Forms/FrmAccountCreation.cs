@@ -83,11 +83,8 @@ namespace BoredWithFriends.Forms
 			{
 				lblWarningInvalidPassword.Text = "Passwords do not match";
 			}
-			if (!nameBlank && !nameTaken && !passwordBlank && passwordsMatch)
-			{
-				return true;
-			}
-			return false;
+
+			return (!nameBlank && !nameTaken && !passwordBlank && passwordsMatch);
 		}
 
 		/// <summary>
