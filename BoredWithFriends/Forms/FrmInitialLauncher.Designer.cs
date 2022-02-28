@@ -59,7 +59,7 @@
             // 
             this.cbxPlayOnline.AutoSize = true;
             this.cbxPlayOnline.Font = new System.Drawing.Font("Sigmar One", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.cbxPlayOnline.Location = new System.Drawing.Point(38, 86);
+            this.cbxPlayOnline.Location = new System.Drawing.Point(43, 82);
             this.cbxPlayOnline.Name = "cbxPlayOnline";
             this.cbxPlayOnline.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.cbxPlayOnline.Size = new System.Drawing.Size(157, 32);
@@ -126,6 +126,7 @@
             this.btnCreateAccount.TabIndex = 9;
             this.btnCreateAccount.Text = "Create Account";
             this.btnCreateAccount.UseVisualStyleBackColor = true;
+            this.btnCreateAccount.Click += new System.EventHandler(this.btnCreateAccount_Click);
             // 
             // btnLogin
             // 
