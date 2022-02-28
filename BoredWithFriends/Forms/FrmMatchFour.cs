@@ -13,7 +13,16 @@ namespace BoredWithFriends.Forms
 {
 	internal partial class FrmMatchFour : Form
 	{
-		private readonly TurnBasedPlayer activePlayer;
+		private readonly TurnBasedPlayer? activePlayer;
+
+		public FrmMatchFour()
+		{
+			//For testing purposes.
+			InitializeComponent();
+			this.ApplyGeneralTheme();
+			ctrlMatchFourBoard.NewGame(new MatchFourGameState(6, 7));
+			activePlayer = null;
+		}
 
 		/// <summary>
 		/// Creates a playable Match Four GUI for one player. When using local play,
@@ -33,7 +42,7 @@ namespace BoredWithFriends.Forms
 			MatchFourGameState gameState = ctrlMatchFourBoard.GameState;
 			
 			//TODO: Warn the player that this will forfeit the match if it's not over, yet.
-			gameState.PlayerForfeit(activePlayer);
+			gameState.PlayerForfeit(activePlayer is null ? gameState.getCurrentPlayer() : activePlayer);
 
 			//TODO: When online play is supported, we will have to call this from the server
 			//side of things and tell the clients to reset vs the user triggering it like this.
@@ -66,7 +75,7 @@ namespace BoredWithFriends.Forms
 
 				MatchFourGameState gameState = ctrlMatchFourBoard.GameState;
 
-				if (gameState.PlayGamePiece(activePlayer, columnIndex))
+				if (gameState.PlayGamePiece(activePlayer is null ? gameState.getCurrentPlayer() : activePlayer, columnIndex))
 				{
 					Refresh();
 				}
