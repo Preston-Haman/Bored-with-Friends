@@ -59,6 +59,9 @@ namespace BoredWithFriends.Forms
 		/// <returns></returns>
 		private bool IsValidLogin(string userName, string password, string confirmPassword)
 		{
+			//clear warnings to adjust to warnings to needed input adjustments
+			ClearWarnings();
+
 			bool nameBlank = string.IsNullOrEmpty(userName);
 			bool nameTaken = NameExists(userName);
 			bool passwordBlank = string.IsNullOrEmpty(password);
@@ -66,25 +69,34 @@ namespace BoredWithFriends.Forms
 
 			if (nameBlank)
 			{
-				lblWarningInvalidName.Text = "Username cannot be blank";
-				return false;
+				lblWarningInvalidName.Text = "Username cannot be blank";				
 			}
 			if (nameTaken)
 			{
 				lblWarningInvalidName.Text = "This username has been taken";
-				return false;
 			}
 			if (passwordBlank)
 			{
 				lblWarningInvalidPassword.Text = "Password cannot be blank";
-				return false;
 			}
 			if (!passwordsMatch)
 			{
 				lblWarningInvalidPassword.Text = "Passwords do not match";
-				return false;
 			}
-			return true;
+			if (!nameBlank && !nameTaken && !passwordBlank && passwordsMatch)
+			{
+				return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Clears all warnings from FrmAccountCreation
+		/// </summary>
+		private void ClearWarnings()
+		{
+			lblWarningInvalidName.Text = string.Empty;
+			lblWarningInvalidPassword.Text = string.Empty;
 		}
 
 		/// <summary>
