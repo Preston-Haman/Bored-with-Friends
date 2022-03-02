@@ -25,7 +25,7 @@ namespace BoredWithFriends.Forms
 		{
 			//Set Form colours
 			form.BackColor = Color.DimGray;
-			form.ForeColor = SystemColors.ActiveCaptionText; //Do we want this?
+			form.ForeColor = SystemColors.ActiveCaptionText; //Do we want this? 
 
 			//Apply theme to controls
 			foreach (Control control in form.Controls)
@@ -52,6 +52,12 @@ namespace BoredWithFriends.Forms
 				{
 					btn.BackColor = SystemColors.ActiveCaption;
 					btn.Cursor = Cursors.Hand;
+				}
+
+				//Checkbox
+				if (control is CheckBox cbx)
+				{
+					cbx.ForeColor = SystemColors.ActiveCaption;
 				}
 			}
 		}
