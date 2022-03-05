@@ -59,8 +59,8 @@ namespace BoredWithFriends.Controls
 
 			//Setup colours
 			SolidBrush emptyBrush = new(ParentForm.BackColor);
-			SolidBrush redBrush = new(Color.Red);
 			SolidBrush blueBrush = new(Color.Blue);
+			SolidBrush redBrush = new(Color.Red);
 			Pen outlinePen = new(Color.Black, 2F);
 
 			//Get the graphics context
@@ -71,7 +71,7 @@ namespace BoredWithFriends.Controls
 				for (int j = 0; j < GameState.Columns; j++)
 				{
 					//Fill sections with circles of blue, red, or empty colour based on GameState
-					switch (GameState.GetTokenAt(j, i))
+					switch (GameState.GetTokenAt(i, j))
 					{
 						case MatchFourGameState.BoardToken.Empty:
 							g.FillEllipse(emptyBrush, x + (j * sectionWidth) + inset, y + (i * sectionHeight) + inset, circleWidth, circleHeight);

@@ -50,7 +50,7 @@ namespace BoredWithFriends.Forms
 			List<Player> players = gameState.Players;
 			List<Player> spectators = gameState.Spectators;
 
-			gameState = new MatchFourGameState(gameState.Rows, gameState.Columns, players[0].PlayerID, players[0].Name, players[1].PlayerID, players[1].Name);
+			gameState = new MatchFourGameState(gameState.Rows, gameState.Columns, players[0], players[1]);
 
 			foreach (Player p in spectators)
 			{
