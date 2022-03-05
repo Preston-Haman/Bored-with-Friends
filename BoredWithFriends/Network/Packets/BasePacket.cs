@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 namespace BoredWithFriends.Network.Packets
 {
 	/// <summary>
-	/// An exception indicating that something has violated either the protocol definition,
+	/// An exception indicating that something has violated either the protocol definiton,
 	/// or some implementation specific detail.
 	/// </summary>
 	internal class ProtocolException : Exception
@@ -120,32 +119,12 @@ namespace BoredWithFriends.Network.Packets
 	}
 
 	/// <summary>
-	/// This is a packet that was sent from a client.
-	/// </summary>
-	internal abstract class ClientPacket : BasePacket
-	{
-		//Server probably needs to know which connection is sending the packet...!
-		protected override abstract void RunImpl(Connection con);
-
-		protected override void RunImpl()
-		{
-			//Do nothing.
-		}
-	}
-
-	/// <summary>
-	/// This is a packet that was sent from the server.
-	/// </summary>
-	internal abstract class ServerPacket : BasePacket
-	{
-		//Eventually this might have some server packet specific aspects
-	}
-
-	/// <summary>
 	/// A packet that can be sent across the network over a <see cref="Connection"/>.
 	/// <br></br><br></br>
-	/// Concrete subclasses must mark themselves with the following Attribute:<br></br>
+	/// Subclasses must mark themselves with the following Attributes:<br></br>
 	/// <list type="bullet"><see cref="PacketAttribute"/></list>
+	///	<list type="bullet"><see cref="ProtocolAttribute"/></list>
+	///	<list type="bullet"><see cref="OpcodeAttribute"/></list>
 	/// </summary>
 	internal abstract class BasePacket
 	{
@@ -169,7 +148,6 @@ namespace BoredWithFriends.Network.Packets
 		/// <paramref name="buffer"/>.</returns>
 		private static PacketHeader ExamineHeader(Connection con, out ByteArrayStream buffer)
 		{
-			//TODO: This implementation is likely to cause problems later...
 			PacketHeader header = new(con.Peek(PacketHeader.HEADER_SIZE));
 
 			buffer = new(con.Read(header.size));
@@ -193,7 +171,7 @@ namespace BoredWithFriends.Network.Packets
 			}
 			catch (Exception e)
 			{
-				Debug.Fail($"{e.GetType().Name}: {e.Message}", e.StackTrace);
+				System.Diagnostics.Debug.Fail(e.ToString());
 				return false;
 			}
 		}
@@ -208,7 +186,7 @@ namespace BoredWithFriends.Network.Packets
 		/// </summary>
 		/// <param name="con">The <see cref="Connection"/> with an incoming packet.</param>
 		/// <returns>True if successful, false otherwise.</returns>
-		public static bool Receive(Connection con)
+		public static bool Recieve(Connection con)
 		{
 			//TODO: Should probably handle this better...
 			try
@@ -217,18 +195,10 @@ namespace BoredWithFriends.Network.Packets
 				BasePacket packet;
 				try
 				{
-					packet = PacketAttribute.CreatePacket(header);
-
-					//This attribute must exist for the above method to return normally.
-					PacketAttribute? packetInfo = Attribute.GetCustomAttribute(packet.GetType(), typeof(PacketAttribute)) as PacketAttribute;
-					if (!con.MatchesAnyConnectionState(packetInfo!.ValidState))
-					{
-						throw new ArgumentException($"Connection has invalid connection state for packet: {con.GetType().Name}");
-					}
+					packet = PacketLookup.CreatePacket(header);
 				}
 				catch (ArgumentException)
 				{
-					//For clarity: this also catches the exception from the CreatePacket method call.
 					System.Diagnostics.Debug.WriteLine("A connection sent an invalid packet; discarding connection.");
 					con.Close();
 					return false;
@@ -236,20 +206,15 @@ namespace BoredWithFriends.Network.Packets
 				
 				packet.Read(header, packetBuffer);
 
-				packet.RunImpl(con);
+				packet.RunImpl();
 
 				return true;
 			}
 			catch (Exception e)
 			{
-				Debug.Fail($"{e.GetType().Name}: {e.Message}", e.StackTrace);
+				System.Diagnostics.Debug.Fail(e.ToString());
 				return false;
 			}
-		}
-
-		public static void RunLocally(BasePacket packet, LocalConnection con)
-		{
-			packet.RunImpl(con);
 		}
 
 		/// <summary>
@@ -262,13 +227,13 @@ namespace BoredWithFriends.Network.Packets
 		/// or the <paramref name="head"/> does not match the <paramref name="buffer"/>.</exception>
 		private void Read(PacketHeader head, ByteArrayStream buffer)
 		{
-			if (Attribute.GetCustomAttribute(this.GetType(), typeof(PacketAttribute)) is not PacketAttribute packetInfo)
+			if (Attribute.GetCustomAttribute(this.GetType(), typeof(ProtocolAttribute)) is not ProtocolAttribute protocol
+				|| Attribute.GetCustomAttribute(this.GetType(), typeof(OpcodeAttribute)) is not OpcodeAttribute opcode)
 			{
-				//Shouldn't even be possible
 				throw new ProtocolException($"The packet {this.GetType().Name} does not declare either its protocol, its opcode, or both.");
 			}
 
-			if (!head.IsValid(packetInfo.Protocol, packetInfo.Opcode))
+			if (!head.IsValid(protocol.Protocol, opcode.Opcode))
 			{
 				throw new ProtocolException("The given packet header does not match this packet implementation!");
 			}
@@ -293,13 +258,14 @@ namespace BoredWithFriends.Network.Packets
 		/// <exception cref="ProtocolException">If this packet is not implemented properly, or violates the protocol.</exception>
 		private void Write(Connection con)
 		{
-			if (Attribute.GetCustomAttribute(this.GetType(), typeof(PacketAttribute)) is not PacketAttribute packetInfo)
+			if (Attribute.GetCustomAttribute(this.GetType(), typeof(ProtocolAttribute)) is not ProtocolAttribute protocol
+				|| Attribute.GetCustomAttribute(this.GetType(), typeof(OpcodeAttribute)) is not OpcodeAttribute opcode)
 			{
 				throw new ProtocolException($"The packet {this.GetType().Name} does not declare either its protocol, its opcode, or both.");
 			}
 			buffer = new ByteArrayStream();
 
-			PacketHeader header = new(PacketHeader.HEADER_SIZE, packetInfo.Protocol, packetInfo.Opcode, VERSION);
+			PacketHeader header = new(PacketHeader.HEADER_SIZE, protocol.Protocol, opcode.Opcode, VERSION);
 			header.Write(buffer);
 
 			//Let subclass write information
@@ -320,35 +286,16 @@ namespace BoredWithFriends.Network.Packets
 		/// <summary>
 		/// Reads information that is specific to this packet's implementation.
 		/// 
-		/// Implementations may use the Read methods provided by <see cref="BasePacket"/>.
+		/// Implmentations may use the Read methods provided by <see cref="BasePacket"/>.
 		/// </summary>
 		protected abstract void ReadImpl();
 
 		/// <summary>
 		/// Writes information that is specific to this packet's implementation.
 		/// 
-		/// Implementations may use the Write methods provided by <see cref="BasePacket"/>.
+		/// Implmentations may use the Write methods provided by <see cref="BasePacket"/>.
 		/// </summary>
 		protected abstract void WriteImpl();
-
-		/// <summary>
-		/// Acts on the information contained within this packet.
-		/// <br></br><br></br>
-		/// This method is for subclasses that might need access to the Connection
-		/// for this packet while acting upon the data. Packets that run on the
-		/// server side may wish to have access to the connection in order to
-		/// identify the source user. Packets that run on the client side
-		/// are unlikely to need the same access, but this method will be here
-		/// for that case, too.
-		/// <br></br><br></br>
-		/// The default implementation merely calls <see cref="RunImpl()"/>, which
-		/// should be sufficient for the majority of subclass implementations.
-		/// </summary>
-		/// <param name="con"></param>
-		protected virtual void RunImpl(Connection con)
-		{
-			RunImpl();
-		}
 
 		/// <summary>
 		/// Acts on the information contained within this packet.
