@@ -131,10 +131,8 @@ namespace BoredWithFriends.Network.Packets
 	/// <summary>
 	/// A packet that can be sent across the network over a <see cref="Connection"/>.
 	/// <br></br><br></br>
-	/// Subclasses must mark themselves with the following Attributes:<br></br>
+	/// Concrete subclasses must mark themselves with the following Attribute:<br></br>
 	/// <list type="bullet"><see cref="PacketAttribute"/></list>
-	///	<list type="bullet"><see cref="ProtocolAttribute"/></list>
-	///	<list type="bullet"><see cref="OpcodeAttribute"/></list>
 	/// </summary>
 	internal abstract class BasePacket
 	{
@@ -237,13 +235,12 @@ namespace BoredWithFriends.Network.Packets
 		/// or the <paramref name="head"/> does not match the <paramref name="buffer"/>.</exception>
 		private void Read(PacketHeader head, ByteArrayStream buffer)
 		{
-			if (Attribute.GetCustomAttribute(this.GetType(), typeof(ProtocolAttribute)) is not ProtocolAttribute protocol
-				|| Attribute.GetCustomAttribute(this.GetType(), typeof(OpcodeAttribute)) is not OpcodeAttribute opcode)
+			if (Attribute.GetCustomAttribute(this.GetType(), typeof(PacketAttribute)) is not PacketAttribute packetInfo)
 			{
 				throw new ProtocolException($"The packet {this.GetType().Name} does not declare either its protocol, its opcode, or both.");
 			}
 
-			if (!head.IsValid(protocol.Protocol, opcode.Opcode))
+			if (!head.IsValid(packetInfo.Protocol, packetInfo.Opcode))
 			{
 				throw new ProtocolException("The given packet header does not match this packet implementation!");
 			}
@@ -268,14 +265,13 @@ namespace BoredWithFriends.Network.Packets
 		/// <exception cref="ProtocolException">If this packet is not implemented properly, or violates the protocol.</exception>
 		private void Write(Connection con)
 		{
-			if (Attribute.GetCustomAttribute(this.GetType(), typeof(ProtocolAttribute)) is not ProtocolAttribute protocol
-				|| Attribute.GetCustomAttribute(this.GetType(), typeof(OpcodeAttribute)) is not OpcodeAttribute opcode)
+			if (Attribute.GetCustomAttribute(this.GetType(), typeof(PacketAttribute)) is not PacketAttribute packetInfo)
 			{
 				throw new ProtocolException($"The packet {this.GetType().Name} does not declare either its protocol, its opcode, or both.");
 			}
 			buffer = new ByteArrayStream();
 
-			PacketHeader header = new(PacketHeader.HEADER_SIZE, protocol.Protocol, opcode.Opcode, VERSION);
+			PacketHeader header = new(PacketHeader.HEADER_SIZE, packetInfo.Protocol, packetInfo.Opcode, VERSION);
 			header.Write(buffer);
 
 			//Let subclass write information

@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.MatchFour.Client
 {
-	[Packet(typeof(ClientRequestBoardState))]
-	[Protocol((short) BoredWithFriendsProtocol.MatchFour)]
-	[Opcode((short) MatchFourOps.RequestBoardState)]
+	[Packet(typeof(ClientRequestBoardState), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.RequestBoardState)]
 	internal class ClientRequestBoardState : ClientPacket
 	{
 		public ClientRequestBoardState()
