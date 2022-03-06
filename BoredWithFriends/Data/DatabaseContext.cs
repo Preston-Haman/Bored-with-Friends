@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Data
 {
-	internal class DatabaseContext: DbContext
+	internal partial class DatabaseContext: DbContext
 	{
 		public DbSet<PlayerLogin> PlayerLogins { get; set; } = null!;
 
 		public DbSet<PlayerStatistics> PlayerStatistics { get; set; } = null!;
 
-		public DatabaseContext()
+		private DatabaseContext()
 		{
 			
 		}
