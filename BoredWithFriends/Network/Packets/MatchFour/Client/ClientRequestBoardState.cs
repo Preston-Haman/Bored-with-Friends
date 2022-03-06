@@ -6,18 +6,22 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.MatchFour.Client
 {
-	/// <summary>
-	/// Sent by the client to request the current state of the board.
-	/// </summary>
-	[Packet(typeof(ClientRequestBoardState), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ClientRequestBoardState)]
+	[Packet(typeof(ClientRequestBoardState))]
+	[Protocol((short) BoredWithFriendsProtocol.MatchFour)]
+	[Opcode((short) MatchFourOps.RequestBoardState)]
 	internal class ClientRequestBoardState : ClientPacket
 	{
+		public ClientRequestBoardState()
+		{
+			//For reflection
+		}
+
 		protected override void ReadImpl()
 		{
 			//Nothing to do.
 		}
 
-		protected override void RunImpl(Connection con)
+		protected override void RunImpl()
 		{
 			//TODO: Reply with SendBoardState
 			throw new NotImplementedException();

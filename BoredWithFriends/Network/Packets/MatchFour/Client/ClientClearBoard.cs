@@ -6,34 +6,30 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.MatchFour.Client
 {
-	/// <summary>
-	/// Sent by the client when a user clears the board.
-	/// </summary>
-	[Packet(typeof(ClientClearBoard), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ClientClearBoard)]
+	[Packet(typeof(ClientClearBoard))]
+	[Protocol((short) BoredWithFriendsProtocol.MatchFour)]
+	[Opcode((short) MatchFourOps.ClearBoard)]
 	internal class ClientClearBoard : ClientPacket
 	{
-		private bool playerForfeited;
-
-		public ClientClearBoard(bool playerForfeited)
+		public ClientClearBoard()
 		{
-			this.playerForfeited = playerForfeited;
+			//For reflection
 		}
 
 		protected override void ReadImpl()
 		{
-			playerForfeited = ReadBool();
+			//Nothing to do.
 		}
 
-		protected override void RunImpl(Connection con)
+		protected override void RunImpl()
 		{
 			//TODO: Get gamestate for this packet and forfeit this player; reply with BoardCleared
-			//If the player is not forfeiting, make sure that the game is over!
 			throw new NotImplementedException();
 		}
 
 		protected override void WriteImpl()
 		{
-			WriteBool(playerForfeited);
+			//Nothing to do.
 		}
 	}
 }

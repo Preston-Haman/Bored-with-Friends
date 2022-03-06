@@ -6,12 +6,16 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.MatchFour.Client
 {
-	/// <summary>
-	/// Sent by the client when the player plays a token.
-	/// </summary>
-	[Packet(typeof(ClientPlayToken), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ClientPlayToken)]
+	[Packet(typeof(ClientPlayToken))]
+	[Protocol((short) BoredWithFriendsProtocol.MatchFour)]
+	[Opcode((short) MatchFourOps.PlayToken)]
 	internal class ClientPlayToken : ClientPacket
 	{
+		public ClientPlayToken()
+		{
+			//For reflection
+		}
+
 		private int row = -1;
 
 		private int column = -1; //Invalid default value just in case.
@@ -28,7 +32,7 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Client
 			column = ReadInt();
 		}
 
-		protected override void RunImpl(Connection con)
+		protected override void RunImpl()
 		{
 			//Get GameState for this packet, and play the token at the specified column if possible
 			//Reply with ServerTokenPlayed
