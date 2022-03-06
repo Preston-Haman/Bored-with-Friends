@@ -34,16 +34,7 @@ namespace BoredWithFriends.Forms
 
 			if (IsValidLogin(userName, password, confirmPassword))
 			{
-
-				PlayerLogin newUser = new()
-				{
-					UserName = userName,
-					Password = password,
-				};
-
-				DatabaseContext database = new();
-				database.Add(newUser);
-				database.SaveChanges();
+				DatabaseContext.CreateNewPlayer(userName, password);
 
 				Close();
 				FrmAccountConfirmation ConfirmNotice = new();
@@ -63,7 +54,7 @@ namespace BoredWithFriends.Forms
 			ClearWarnings();
 
 			bool nameBlank = string.IsNullOrEmpty(userName);
-			bool nameTaken = NameExists(userName);
+			bool nameTaken = DatabaseContext.NameExists(userName);
 			bool passwordBlank = string.IsNullOrEmpty(password);
 			bool passwordsMatch = password.Equals(confirmPassword);
 
@@ -96,25 +87,21 @@ namespace BoredWithFriends.Forms
 			lblWarningInvalidPassword.Text = string.Empty;
 		}
 
-		/// <summary>
-		/// Checks if a user name exists in the database
-		/// </summary>
-		/// <param name="userName">The user name to search for</param>
-		/// <returns>True if found</returns>
-		private static bool NameExists(string userName)
-		{
-			DatabaseContext database = new();
 
-			PlayerLogin? nameSearch = (from logins in database.PlayerLogins
-								   where logins.UserName == userName
-								   select logins).SingleOrDefault();
+		//private static bool NameExists(string userName)
+		//{
+		//	DatabaseContext database = new();
 
-			if (nameSearch is null)
-			{
-				return false;
-			}
-			return true;
-		}
+		//	PlayerLogin? nameSearch = (from logins in database.PlayerLogins
+		//						   where logins.UserName == userName
+		//						   select logins).SingleOrDefault();
+
+		//	if (nameSearch is null)
+		//	{
+		//		return false;
+		//	}
+		//	return true;
+		//}
 
 	}
 }
