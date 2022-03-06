@@ -7,6 +7,7 @@ using static BoredWithFriends.Games.MatchFourGameState;
 
 namespace BoredWithFriends.Network.Packets.MatchFour.Server
 {
+	[Packet(typeof(ServerTokenPlayed), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.TokenPlayed)]
 	internal class ServerTokenPlayed : ServerPacket
 	{
 		public ServerTokenPlayed()
