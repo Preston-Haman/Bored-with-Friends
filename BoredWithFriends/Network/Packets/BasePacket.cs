@@ -118,6 +118,16 @@ namespace BoredWithFriends.Network.Packets
 		}
 	}
 
+	internal abstract class ClientPacket : BasePacket
+	{
+		//Eventually this might have some client specific aspects
+	}
+
+	internal abstract class ServerPacket : BasePacket
+	{
+		//Eventually this might have some server specific aspects
+	}
+
 	/// <summary>
 	/// A packet that can be sent across the network over a <see cref="Connection"/>.
 	/// <br></br><br></br>
