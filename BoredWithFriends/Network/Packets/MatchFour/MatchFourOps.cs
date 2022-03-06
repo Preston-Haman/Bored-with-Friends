@@ -6,19 +6,16 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.MatchFour
 {
-	/// <summary>
-	/// The named opcodes for the <see cref="BoredWithFriendsProtocol.MatchFour"/> protocol.
-	/// </summary>
 	internal enum MatchFourOps : short
 	{
 		//Client Ops
-		ClientRequestBoardState,
-		ClientPlayToken,
-		ClientClearBoard,
+		RequestBoardState,
+		PlayToken,
+		ClearBoard,
 
 		//Server Ops
-		ServerSendBoardState,
-		ServerTokenPlayed,
-		ServerBoardCleared,
+		SendBoardState,
+		TokenPlayed,
+		BoardCleared,
 	}
 }

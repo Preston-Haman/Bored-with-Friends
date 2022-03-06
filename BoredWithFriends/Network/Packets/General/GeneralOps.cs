@@ -6,30 +6,29 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.General
 {
-	/// <summary>
-	/// The named opcodes for the <see cref="BoredWithFriendsProtocol.General"/> protocol.
-	/// </summary>
 	internal enum GeneralOps
 	{
 		//Client Ops
-		ClientConnect,
-		ClientLogin,
-		ClientAccountManagement,
-		ClientUpdatePassword,
-		ClientDeleteAccount,
-		ClientSelectGame,
-		ClientDisconnect,
+		Connect,
+		CreateAccount,
+		Login,
+		AccountManagement,
+		UpdatePassword,
+		DeleteAccount,
+		SelectGame,
+		Disconnect,
 
 		//Server Ops
-		ServerConnected,
-		ServerApproveLogin,
-		ServerSendAccountDetails,
-		ServerApprovePasswordUpdate,
-		ServerAccountDeleted,
-		ServerEnterGameLobby,
-		ServerAddPlayer,
-		ServerAddSpectator,
-		ServerStartGame,
-		ServerCloseConnection
+		Connected,
+		ApproveAccount,
+		ApproveLogin,
+		SendAccountDetails,
+		ApprovePasswordUpdate,
+		AccountDeleted,
+		EnterGameLobby,
+		AddPlayer,
+		AddSpectator,
+		StartGame,
+		CloseConnection
 	}
 }

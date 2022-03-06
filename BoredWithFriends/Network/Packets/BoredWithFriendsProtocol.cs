@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets
 {
-	/// <summary>
-	/// The named protocols implemented by this application's network handling.
-	/// </summary>
 	internal enum BoredWithFriendsProtocol : short
 	{
 		General,
