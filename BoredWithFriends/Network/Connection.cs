@@ -1,12 +1,130 @@
-﻿using System;
+﻿using BoredWithFriends.Games;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network
 {
+	/// <summary>
+	/// Represents a client's connection to this application while it's running as a server.
+	/// <br></br><br></br>
+	/// It's important to note that this connection may not be a legitimate user of this
+	/// application. There is a chance that some service is scanning for open ports and
+	/// they made a conection to us. These connection objects are short lived; they are
+	/// either replaced with a <see cref="PlayerConnection"/>, or rejected.
+	/// </summary>
+	internal class ClientConnection : Connection
+	{
+		/// <summary>
+		/// Tracks whether or not this connection's underlying TcpClient
+		/// has been adopted by something else.
+		/// <br></br><br></br>
+		/// If something else has adopted the TcpClient, then this
+		/// connection will act as if it has been closed.
+		/// </summary>
+		protected bool isAdopted = false;
+
+		public ClientConnection(TcpClient client) : base(client)
+		{
+			//Nothing to do.
+		}
+
+		/// <inheritdoc/>
+		public override bool IsOpen()
+		{
+			return !isAdopted && base.IsOpen();
+		}
+
+		/// <summary>
+		/// Returns the underlying TcpClient this Connection uses,
+		/// and considers this connection to be closed.
+		/// <br></br><br></br>
+		/// <seealso cref="isAdopted"/>
+		/// </summary>
+		/// <returns>The underlying TcpClient this connection uses.</returns>
+		public virtual TcpClient AdoptClient()
+		{
+			isAdopted = true;
+			return client;
+		}
+	}
+
+	/// <summary>
+	/// Represents a Player's connection to this application while it's running as a server.
+	/// </summary>
+	internal class PlayerConnection : Connection
+	{
+		/// <summary>
+		/// The <see cref="BoredWithFriends.Games.Player"/> this connection is for.
+		/// <br></br><br></br>
+		/// This property is only assigned during construction of this connection.
+		/// </summary>
+		public Player Player { get; private set; }
+
+		/// <summary>
+		/// The PlayerID property of <see cref="Player"/>.
+		/// <br></br><br></br>
+		/// This property is just for convenient access.
+		/// </summary>
+		public int PlayerID
+		{
+			get
+			{
+				return Player.PlayerID;
+			}
+		}
+
+		/// <summary>
+		/// Creates a new <see cref="PlayerConnection"/> using the given <see cref="TcpClient"/>.
+		/// <br></br><br></br>
+		/// The <paramref name="player"/> is stored in the <see cref="Player"/> property.
+		/// </summary>
+		/// <param name="client">The TcpClient this connection will use.</param>
+		/// <param name="player">The <see cref="BoredWithFriends.Games.Player"/> that this connection is for.</param>
+		public PlayerConnection(TcpClient client, Player player) : base(client)
+		{
+			Player = player;
+		}
+	}
+
+	/// <summary>
+	/// Represents a connection to a Server when this application is running as a client.
+	/// </summary>
+	internal class ServerConnection : Connection
+	{
+		/// <summary>
+		/// The remote IP and port of the server this connection is for.
+		/// </summary>
+		public IPEndPoint ServerInfo { get; }
+		
+		/// <summary>
+		/// Creates a new <see cref="ServerConnection"/>. This will create a new TcpClient and attempt
+		/// to connect to the given <paramref name="serverIP"/> on the given <paramref name="serverPort"/>
+		/// in blocking mode.
+		/// </summary>
+		/// <param name="serverIP">The remote IP of the server to connect to as a string.</param>
+		/// <param name="serverPort">The remote port of the server to connect to.</param>
+		public ServerConnection(string serverIP, int serverPort) : this(new IPEndPoint(IPAddress.Parse(serverIP), serverPort))
+		{
+			//Nothing else to do.
+		}
+
+		/// <summary>
+		/// Creates a new <see cref="ServerConnection"/>. This will create a new TcpClient and attempt
+		/// to connect to the given <paramref name="serverIP"/> in blocking mode.
+		/// </summary>
+		/// <param name="serverIP">The remote IP and Port of the server to connect to.</param>
+		public ServerConnection(IPEndPoint serverIP) : base(new TcpClient())
+		{
+			ServerInfo = serverIP;
+			client.Connect(serverIP);
+		}
+	}
+
 	/// <summary>
 	/// A base class for connections; this class and subclasses are responsible for handling
 	/// the network.
@@ -43,7 +161,7 @@ namespace BoredWithFriends.Network
 		/// Checks if this connection is open and returns the result.
 		/// </summary>
 		/// <returns>True if this connection is active, false otherwise.</returns>
-		public bool IsOpen()
+		public virtual bool IsOpen()
 		{
 			return client.Connected;
 		}
