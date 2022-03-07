@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Data
 {
-	partial class DatabaseContext
+	internal partial class DatabaseContext
 	{
 		/// <summary>
 		/// Creates a new player account, and a new set of statistics
@@ -44,6 +44,27 @@ namespace BoredWithFriends.Data
 		/// <param name="userName">The user name to search for</param>
 		/// <returns>True if found</returns>
 		public static bool NameExists(string userName)
+		{			
+			PlayerLogin? nameSearch = NameSearch(userName);
+
+			if (nameSearch is null)
+			{
+				return false;
+			}
+			return true;
+		}
+		public static void UpdatePassword(string userName, string password)
+		{
+			//look for username
+			throw new NotImplementedException();
+
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="userName"></param>
+		/// <returns></returns>
+		private static PlayerLogin? NameSearch(string userName)
 		{
 			DatabaseContext database = new();
 
@@ -51,11 +72,7 @@ namespace BoredWithFriends.Data
 									   where logins.UserName == userName
 									   select logins).SingleOrDefault();
 
-			if (nameSearch is null)
-			{
-				return false;
-			}
-			return true;
+			return nameSearch;
 		}
 	}
 }

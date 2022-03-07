@@ -54,7 +54,7 @@ namespace BoredWithFriends.Forms
 			ClearWarnings();
 
 			bool nameBlank = string.IsNullOrEmpty(userName);
-			bool nameTaken = DatabaseContext.NameExists(userName);
+			bool nameExists = DatabaseContext.NameExists(userName);
 			bool passwordBlank = string.IsNullOrEmpty(password);
 			bool passwordsMatch = password.Equals(confirmPassword);
 
@@ -62,7 +62,7 @@ namespace BoredWithFriends.Forms
 			{
 				lblWarningInvalidName.Text = "Username cannot be blank";				
 			}
-			else if (nameTaken)
+			else if (nameExists)
 			{
 				lblWarningInvalidName.Text = "This username has been taken";
 			}
@@ -75,7 +75,7 @@ namespace BoredWithFriends.Forms
 				lblWarningInvalidPassword.Text = "Passwords do not match";
 			}
 
-			return (!nameBlank && !nameTaken && !passwordBlank && passwordsMatch);
+			return (!nameBlank && nameExists && !passwordBlank && passwordsMatch);
 		}
 
 		/// <summary>
@@ -86,22 +86,5 @@ namespace BoredWithFriends.Forms
 			lblWarningInvalidName.Text = string.Empty;
 			lblWarningInvalidPassword.Text = string.Empty;
 		}
-
-
-		//private static bool NameExists(string userName)
-		//{
-		//	DatabaseContext database = new();
-
-		//	PlayerLogin? nameSearch = (from logins in database.PlayerLogins
-		//						   where logins.UserName == userName
-		//						   select logins).SingleOrDefault();
-
-		//	if (nameSearch is null)
-		//	{
-		//		return false;
-		//	}
-		//	return true;
-		//}
-
 	}
 }
