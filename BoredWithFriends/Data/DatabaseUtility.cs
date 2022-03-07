@@ -39,35 +39,35 @@ namespace BoredWithFriends.Data
 		}
 
 		/// <summary>
+		/// Searches for a specific user name in the database
+		/// </summary>
+		/// <param name="userName">The UserName to search for</param>
+		/// <returns>The PlayerLogin object containing that user name</returns>
+		public static PlayerLogin? RetrieveByUser(string userName)
+		{
+			DatabaseContext database = new();
+
+			PlayerLogin? user = (from logins in database.PlayerLogins
+										   where logins.UserName == userName
+										   select logins).SingleOrDefault();
+
+			return user;
+		}
+
+		/// <summary>
 		/// Checks if a user name exists in the database
 		/// </summary>
 		/// <param name="userName">The user name to search for</param>
 		/// <returns>True if found</returns>
 		public static bool NameExists(string userName)
-		{			
-			PlayerLogin? nameSearch = NameSearch(userName);
+		{
+			PlayerLogin? user = RetrieveByUser(userName);
 
-			if (nameSearch is null)
+			if (user is null)
 			{
 				return false;
 			}
 			return true;
-		}
-
-		/// <summary>
-		/// Searches for a specific user name in the database
-		/// </summary>
-		/// <param name="userName">The UserName to search for</param>
-		/// <returns>The PlayerLogin object containing that user name</returns>
-		private static PlayerLogin? NameSearch(string userName)
-		{
-			DatabaseContext database = new();
-
-			PlayerLogin? nameSearch = (from logins in database.PlayerLogins
-									   where logins.UserName == userName
-									   select logins).SingleOrDefault();
-
-			return nameSearch;
 		}
 
 		/// <summary>
@@ -78,10 +78,25 @@ namespace BoredWithFriends.Data
 		/// <param name="password">The password to change to</param>
 		public static void UpdatePassword(string userName, string password)
 		{
-			DatabaseContext database = new();
-			PlayerLogin? user = NameSearch(userName);
+			PlayerLogin? user = RetrieveByUser(userName);
+
+			
+
 			user.Password = password;
+
+			DatabaseContext database = new();
 			database.Update(user);
+			database.SaveChangesAsync();
+		}
+
+		public static void DeleteUser(string userName)
+		{
+			PlayerLogin? user = RetrieveByUser(userName);
+
+			
+
+			DatabaseContext? database = new();
+			database.Remove(user);
 			database.SaveChangesAsync();
 		}
 	}
