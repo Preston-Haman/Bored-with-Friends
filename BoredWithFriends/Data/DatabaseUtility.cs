@@ -48,8 +48,10 @@ namespace BoredWithFriends.Data
 			DatabaseContext database = new();
 
 			PlayerLogin? user = (from logins in database.PlayerLogins
-										   where logins.UserName == userName
-										   select logins).SingleOrDefault();
+								 where logins.UserName == userName
+								 select logins).SingleOrDefault();
+
+			CheckNull(user);
 
 			return user;
 		}
@@ -61,7 +63,10 @@ namespace BoredWithFriends.Data
 		/// <returns>True if found</returns>
 		public static bool NameExists(string userName)
 		{
-			PlayerLogin? user = RetrieveByUser(userName);
+			DatabaseContext database = new();
+			PlayerLogin? user = (from logins in database.PlayerLogins
+								 where logins.UserName == userName
+								 select logins).SingleOrDefault();
 
 			if (user is null)
 			{
@@ -80,8 +85,6 @@ namespace BoredWithFriends.Data
 		{
 			PlayerLogin? user = RetrieveByUser(userName);
 
-			
-
 			user.Password = password;
 
 			DatabaseContext database = new();
@@ -93,11 +96,22 @@ namespace BoredWithFriends.Data
 		{
 			PlayerLogin? user = RetrieveByUser(userName);
 
-			
-
 			DatabaseContext? database = new();
 			database.Remove(user);
 			database.SaveChangesAsync();
+		}
+
+		/// <summary>
+		/// Checks if a username is null, and thows an ArgumentNulLexception if null.
+		/// </summary>
+		/// <param name="userName">The object to check if null</param>
+		/// <exception cref="ArgumentNullException">Notifies user no such user name exists</exception>
+		private static void CheckNull(Object userName)
+		{
+			if (userName == null)
+			{
+				throw new ArgumentNullException("No such user name exists");
+			}
 		}
 	}
 }
