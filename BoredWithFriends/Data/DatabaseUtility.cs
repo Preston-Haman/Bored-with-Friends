@@ -101,6 +101,22 @@ namespace BoredWithFriends.Data
 			database.SaveChangesAsync();
 		}
 
+		public static PlayerStatistics RetreiveStats(string userName)
+		{
+			//TO DO: Create private retrieve by ID method
+			PlayerLogin? user = RetrieveByUser(userName);
+			int id = user.PlayerID;
+
+			CheckNull(user);
+
+			DatabaseContext database = new();
+			PlayerStatistics? userStats = (from statistics in database.PlayerStatistics
+										  where statistics.PlayerID == id
+										  select statistics).SingleOrDefault();
+			//MessageBox.Show(userStats.ToString());
+			return userStats;
+		}
+
 		/// <summary>
 		/// Checks if a username is null, and thows an ArgumentNulLexception if null.
 		/// </summary>
