@@ -214,7 +214,7 @@ namespace BoredWithFriends.Network.Packets
 				
 				packet.Read(header, packetBuffer);
 
-				packet.RunImpl();
+				packet.RunImpl(con);
 
 				return true;
 			}
@@ -302,6 +302,21 @@ namespace BoredWithFriends.Network.Packets
 		/// Implmentations may use the Write methods provided by <see cref="BasePacket"/>.
 		/// </summary>
 		protected abstract void WriteImpl();
+
+		/// <summary>
+		/// This method is for subclasses that might need access to the Connection
+		/// for this packet while acting upon the data. It's unlikely that this
+		/// will be necessary in any given subclass implementation, but it
+		/// will be here on the off chance that it is.
+		/// <br></br><br></br>
+		/// The default implementation merely calls <see cref="RunImpl()"/>, which
+		/// should be sufficient for the majority of subclass implementations.
+		/// </summary>
+		/// <param name="con"></param>
+		protected virtual void RunImpl(Connection con)
+		{
+			RunImpl();
+		}
 
 		/// <summary>
 		/// Acts on the information contained within this packet.
