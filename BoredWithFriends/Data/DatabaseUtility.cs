@@ -33,9 +33,9 @@ namespace BoredWithFriends.Data
 			};
 
 			DatabaseContext database = new();
-			database.Add(newUser);
-			database.Add(statistics);
-			database.SaveChanges();
+			database.AddAsync(newUser);
+			database.AddAsync(statistics);
+			database.SaveChangesAsync();
 		}
 
 		/// <summary>
@@ -53,12 +53,7 @@ namespace BoredWithFriends.Data
 			}
 			return true;
 		}
-		public static void UpdatePassword(string userName, string password)
-		{
-			//look for username
-			throw new NotImplementedException();
 
-		}
 		/// <summary>
 		/// Searches for a specific user name in the database
 		/// </summary>
@@ -73,6 +68,21 @@ namespace BoredWithFriends.Data
 									   select logins).SingleOrDefault();
 
 			return nameSearch;
+		}
+
+		/// <summary>
+		/// Updates a user's password by searching for 
+		/// their username in the database
+		/// </summary>
+		/// <param name="userName">The user to change passwords</param>
+		/// <param name="password">The password to change to</param>
+		public static void UpdatePassword(string userName, string password)
+		{
+			DatabaseContext database = new();
+			PlayerLogin? user = NameSearch(userName);
+			user.Password = password;
+			database.Update(user);
+			database.SaveChangesAsync();
 		}
 	}
 }
