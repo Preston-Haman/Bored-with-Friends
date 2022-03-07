@@ -147,11 +147,11 @@ namespace BoredWithFriends.Games
 		}
 
 		/// <summary>
-		/// Adds a Player to this game as a spectator. Note that the caller is responsible
+		/// Adds Players to this game as spectators. Note that the caller is responsible
 		/// for preventing the addition of a competing player.
 		/// </summary>
 		/// <param name="players">A list of players to add to this game as spectators.</param>
-		public virtual void AddSpectatingPlayer(params Player[] players)
+		public virtual void AddSpectatingPlayers(params Player[] players)
 		{
 			foreach (Player p in players)
 			{

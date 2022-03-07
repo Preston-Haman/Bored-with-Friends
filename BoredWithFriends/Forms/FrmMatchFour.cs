@@ -51,11 +51,7 @@ namespace BoredWithFriends.Forms
 			List<Player> spectators = gameState.Spectators;
 
 			gameState = new MatchFourGameState(gameState.Rows, gameState.Columns, players[0], players[1]);
-
-			foreach (Player p in spectators)
-			{
-				gameState.AddSpectatingPlayer(p);
-			}
+			gameState.AddSpectatingPlayers(spectators.ToArray());
 
 			ctrlMatchFourBoard.NewGame(gameState);
 			Refresh();
