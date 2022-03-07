@@ -60,10 +60,10 @@ namespace BoredWithFriends.Data
 
 		}
 		/// <summary>
-		/// 
+		/// Searches for a specific user name in the database
 		/// </summary>
-		/// <param name="userName"></param>
-		/// <returns></returns>
+		/// <param name="userName">The UserName to search for</param>
+		/// <returns>The PlayerLogin object containing that user name</returns>
 		private static PlayerLogin? NameSearch(string userName)
 		{
 			DatabaseContext database = new();
