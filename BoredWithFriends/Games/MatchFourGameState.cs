@@ -305,7 +305,7 @@ namespace BoredWithFriends.Games
 		}
 
 		/// <inheritdoc/>
-		public override TurnBasedPlayer getCurrentPlayer()
+		public override TurnBasedPlayer GetCurrentPlayer()
 		{
 			if (player1.IsPlayerTurn)
 			{

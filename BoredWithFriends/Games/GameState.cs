@@ -8,7 +8,7 @@ namespace BoredWithFriends.Games
 {
 	/// <summary>
 	/// The most basic representation of a Player. This class holds a reference to the player's
-	/// username and their ID -- both from the database -- except when the player is a guest.
+	/// username and their ID -- both from the database (except when the player is a guest).
 	/// </summary>
 	internal class Player
 	{
@@ -243,7 +243,7 @@ namespace BoredWithFriends.Games
 		/// then this method should throw an exception.
 		/// </summary>
 		/// <returns>The Player who is currently being allowed a turn.</returns>
-		public abstract Player getCurrentPlayer();
+		public abstract Player GetCurrentPlayer();
 
 	}
 }
