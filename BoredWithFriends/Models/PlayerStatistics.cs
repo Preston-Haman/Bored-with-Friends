@@ -10,7 +10,7 @@ namespace BoredWithFriends.Models
 	internal class PlayerStatistics
 	{
 		[Key]
-		public int PlayerID { get; set; }
+		public int PlayerStatisticsID { get; set; }
 
 		public DateTime LastPlayedTime { get; set; }
 

@@ -14,7 +14,7 @@ namespace BoredWithFriends.Data
 
 		public DbSet<PlayerStatistics> PlayerStatistics { get; set; } = null!;
 
-		private DatabaseContext()
+		public DatabaseContext()
 		{
 			
 		}
