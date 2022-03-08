@@ -39,9 +39,9 @@ namespace BoredWithFriends.Network
 		/// </summary>
 		/// <param name="localMode">If true, this will run in a local mode on the loopback
 		/// address of the running machine.</param>
-		public ServerNetworkHandler(bool localMode = false) : base("Server")
+		public ServerNetworkHandler(int port = 7777, bool localMode = false) : base("Server")
 		{
-			server = localMode ? new TcpListener(IPAddress.Loopback, 7777) : new TcpListener(IPAddress.Any, 7777);
+			server = localMode ? new TcpListener(IPAddress.Loopback, port) : new TcpListener(IPAddress.Any, port);
 		}
 
 		~ServerNetworkHandler()
@@ -62,6 +62,7 @@ namespace BoredWithFriends.Network
 			}
 		}
 
+		/// <inheritdoc/>
 		public override void Stop()
 		{
 			if (IsStarted)
@@ -102,10 +103,26 @@ namespace BoredWithFriends.Network
 	/// </summary>
 	internal class ClientNetworkHandler : NetworkHandler
 	{
+		/// <summary>
+		/// A reference to the server connection being used by this client.
+		/// </summary>
 		private ServerConnection? serverConnection = null;
 
+		/// <summary>
+		/// A reference to the thread that will attempt to connect
+		/// to the server with a blocking call. This thread
+		/// should be short lived.
+		/// </summary>
 		private Thread? connectionThread = null;
 
+		/// <summary>
+		/// Constructs a new <see cref="ClientNetworkHandler"/>. Call
+		/// <see cref="ConnectToServer"/> to connect to a remote server.
+		/// <br></br><br></br>
+		/// Note that calls to <see cref="NetworkHandler.Start"/> will
+		/// start the dispatch thread of the base implementation even
+		/// if there i
+		/// </summary>
 		public ClientNetworkHandler() : base("Client")
 		{
 			//Nothing to do
@@ -116,12 +133,35 @@ namespace BoredWithFriends.Network
 			Stop();
 		}
 
-		public override void Stop()
+		/// <summary>
+		/// For <see cref="ClientNetworkHandler"/>, this will only start
+		/// the dispatch thread after a connecton has been established.
+		/// <br></br><br></br>
+		/// <inheritdoc/>
+		/// </summary>
+		public override void Start()
 		{
-			CloseServerConnection();
-			base.Stop();
+			if (serverConnection is not null)
+			{
+				base.Start();
+			}
 		}
 
+		/// <inheritdoc/>
+		public override void Stop()
+		{
+			if (IsStarted)
+			{
+				CloseServerConnection();
+				base.Stop();
+			}
+		}
+
+		/// <summary>
+		/// Closes the connection to the remote server. If the
+		/// <see cref="connectionThread"/> never completed, then
+		/// this will do nothing.
+		/// </summary>
 		private void CloseServerConnection()
 		{
 			lock (this)
@@ -139,7 +179,14 @@ namespace BoredWithFriends.Network
 			}
 		}
 
-		public void ConnectToServer(string playerUsername, string password, bool createNew = false, string serverIP = "127.0.0.1", int port = 7777)
+		/// <summary>
+		/// Connects to a remote server on the given <paramref name="serverIP"/>
+		/// and <paramref name="port"/>. If neither are specified, then a local
+		/// connection will be attempted on port 7777.
+		/// </summary>
+		/// <param name="serverIP">The IP address of the remote server to connect to.</param>
+		/// <param name="port">The port to connect to the remote server on.</param>
+		public void ConnectToServer(string serverIP = "127.0.0.1", int port = 7777)
 		{
 			CloseServerConnection();
 
@@ -148,6 +195,7 @@ namespace BoredWithFriends.Network
 			connectionThread.IsBackground = true;
 			connectionThread.Start();
 
+			//Attempts to connect to the remote server specified on the new Thread.
 			void CreateConnection()
 			{
 				try
@@ -162,17 +210,8 @@ namespace BoredWithFriends.Network
 						catch (ThreadInterruptedException)
 						{
 							//We failed to connect before the client gave up.
-							serverConnection = null; //I don't think this will do anything.
-
-							//This thread is about to terminate, we don't need a reference to it anymore.
-							lock (connectionThread!)
-							{
-								if (connectionThread == Thread.CurrentThread)
-								{
-									connectionThread = null;
-								}
-							}
-							return;
+							//Avoid adding null as a connection
+							goto ThreadEnd;
 						}
 						catch
 						{
@@ -187,6 +226,7 @@ namespace BoredWithFriends.Network
 					//Catching twice for safety
 				}
 
+			ThreadEnd:
 				//This thread is about to terminate, we don't need a reference to it anymore.
 				lock (connectionThread!)
 				{
@@ -229,6 +269,10 @@ namespace BoredWithFriends.Network
 		/// </summary>
 		private Thread? dispatchThread;
 
+		/// <summary>
+		/// A lockable object that tracks if the <see cref="dispatchThread"/> is
+		/// started, and/or is stopping.
+		/// </summary>
 		private Tuple<bool, bool> isStartedAndIsStopping = new(false, false);
 
 		/// <summary>
@@ -250,6 +294,9 @@ namespace BoredWithFriends.Network
 			}
 		}
 
+		/// <summary>
+		/// Tracks if this handler is attempting to stop or not.
+		/// </summary>
 		private bool IsStopping
 		{
 			get
@@ -310,7 +357,10 @@ namespace BoredWithFriends.Network
 
 		/// <summary>
 		/// Starts this handler's separate threads; this begins the handling of
-		/// networking aspects that have been registered.
+		/// networking aspects that have been registered. This call may block
+		/// in increments of 5ms if this service was recently asked to stop;
+		/// control will return once the previous networking management has
+		/// fully stopped and the new management started.
 		/// <br></br><br></br>
 		/// Subclasses should check <see cref="IsStarted"/> before performing any
 		/// operations that interact with other threads. The base implementation
@@ -334,6 +384,15 @@ namespace BoredWithFriends.Network
 			}
 		}
 
+		/// <summary>
+		/// Stops this handler's separate threads; this ends the handling of
+		/// networking aspects that have been registered. All registered
+		/// connections will be closed and discarded. All outbound packets
+		/// will be ignored and discarded.
+		/// <br></br><br></br>
+		/// Subclasses are responsible for tracking the status of any threads
+		/// they may have spawned.
+		/// </summary>
 		public virtual void Stop()
 		{
 			lock (this)
@@ -433,6 +492,7 @@ namespace BoredWithFriends.Network
 			{
 				//Catching twice for safety
 			}
+
 			lock (isStartedAndIsStopping)
 			{
 				try
@@ -459,7 +519,6 @@ namespace BoredWithFriends.Network
 					connections.Clear();
 					packetsToSend.Clear();
 				}
-
 
 				//Thread is about to exit, we don't need a reference to it anymore.
 				lock (dispatchThread!)
