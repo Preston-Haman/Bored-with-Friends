@@ -12,6 +12,8 @@ namespace BoredWithFriends.Models
 		[Key]
 		public int PlayerID { get; private set; }
 
+		public PlayerStatistics PlayerStatistics { get; set; } = null!;
+
 		public string UserName { get; set; } = null!;
 
 		public string Password { get; set; } = null!;

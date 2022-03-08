@@ -20,21 +20,13 @@ namespace BoredWithFriends.Data
 			PlayerLogin newUser = new()
 			{
 				UserName = userName,
-				Password = password
-			};
-
-			PlayerStatistics statistics = new()
-			{
-				LastPlayedTime = DateTime.Now,
-				TotalPlayTime = 0,
-				RoundsPlayed = 0,
-				Wins = 0,
-				Losses = 0
+				Password = password,
+				//auto generate playerstatistics ID with defaults
+				PlayerStatistics = new()
 			};
 
 			DatabaseContext database = new();
 			database.AddAsync(newUser);
-			database.AddAsync(statistics);
 			database.SaveChangesAsync();
 		}
 
@@ -111,9 +103,8 @@ namespace BoredWithFriends.Data
 
 			DatabaseContext database = new();
 			PlayerStatistics? userStats = (from statistics in database.PlayerStatistics
-										  where statistics.PlayerID == id
-										  select statistics).SingleOrDefault();
-			//MessageBox.Show(userStats.ToString());
+										   where statistics.PlayerStatisticsID == id
+										   select statistics).SingleOrDefault();
 			return userStats;
 		}
 
