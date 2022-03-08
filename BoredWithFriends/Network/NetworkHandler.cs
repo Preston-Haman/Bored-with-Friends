@@ -31,7 +31,7 @@ namespace BoredWithFriends.Network
 		/// <summary>
 		/// The Thread that <see cref="server"/> will listen on.
 		/// </summary>
-		private readonly Thread listener;
+		private Thread? listener;
 
 		/// <summary>
 		/// Creates a new <see cref="ServerNetworkHandler"/>. It will not be started
@@ -42,18 +42,32 @@ namespace BoredWithFriends.Network
 		public ServerNetworkHandler(bool localMode = false) : base("Server")
 		{
 			server = localMode ? new TcpListener(IPAddress.Loopback, 7777) : new TcpListener(IPAddress.Any, 7777);
-			listener = new(new ThreadStart(ListenForConnections));
-			listener.Name = "Server Connection Listener";
-			listener.IsBackground = true;
+		}
+
+		~ServerNetworkHandler()
+		{
+			Stop();
 		}
 
 		/// <inheritdoc/>
 		public override void Start()
 		{
-			if (!isStarted)
+			if (!IsStarted)
 			{
 				base.Start();
+				listener = new(new ThreadStart(ListenForConnections));
+				listener.Name = "Server Connection Listener";
+				listener.IsBackground = true;
 				listener.Start();
+			}
+		}
+
+		public override void Stop()
+		{
+			if (IsStarted)
+			{
+				listener!.Interrupt();
+				base.Stop();
 			}
 		}
 
@@ -64,11 +78,20 @@ namespace BoredWithFriends.Network
 		/// </summary>
 		protected void ListenForConnections()
 		{
-			server.Start();
-			while (true)
+			try
 			{
-				ClientConnection con = new(server.AcceptTcpClient());
-				AddConnection(con);
+				server.Start();
+				while (true)
+				{
+					ClientConnection con = new(server.AcceptTcpClient());
+					AddConnection(con);
+					//TODO: Send packet out on con asking for handshake.
+				}
+			}
+			catch (ThreadInterruptedException)
+			{
+				//Shutdown.
+				server.Stop();
 			}
 		}
 	}
@@ -79,16 +102,100 @@ namespace BoredWithFriends.Network
 	/// </summary>
 	internal class ClientNetworkHandler : NetworkHandler
 	{
+		private ServerConnection? serverConnection = null;
+
+		private Thread? connectionThread = null;
+
 		public ClientNetworkHandler() : base("Client")
 		{
-			//For local play
-
+			//Nothing to do
 		}
 
-		public ClientNetworkHandler(string serverIP, int port) : base("Client")
+		~ClientNetworkHandler()
 		{
-			//For online play
-			throw new NotImplementedException();
+			Stop();
+		}
+
+		public override void Stop()
+		{
+			CloseServerConnection();
+			base.Stop();
+		}
+
+		private void CloseServerConnection()
+		{
+			lock (this)
+			{
+				if (connectionThread is not null)
+				{
+					connectionThread.Interrupt();
+				}
+
+				if (serverConnection is not null)
+				{
+					serverConnection.Close();
+					serverConnection = null;
+				}
+			}
+		}
+
+		public void ConnectToServer(string playerUsername, string password, bool createNew = false, string serverIP = "127.0.0.1", int port = 7777)
+		{
+			CloseServerConnection();
+
+			connectionThread = new(new ThreadStart(CreateConnection));
+			connectionThread.Name = "Server Handshake";
+			connectionThread.IsBackground = true;
+			connectionThread.Start();
+
+			void CreateConnection()
+			{
+				try
+				{
+					while (serverConnection is null)
+					{
+						try
+						{
+							//This is a blocking call
+							serverConnection = new(serverIP, port);
+						}
+						catch (ThreadInterruptedException)
+						{
+							//We failed to connect before the client gave up.
+							serverConnection = null; //I don't think this will do anything.
+
+							//This thread is about to terminate, we don't need a reference to it anymore.
+							lock (connectionThread!)
+							{
+								if (connectionThread == Thread.CurrentThread)
+								{
+									connectionThread = null;
+								}
+							}
+							return;
+						}
+						catch
+						{
+							//Try again in a moment.
+							Thread.Sleep(100);
+						}
+					}
+					AddConnection(serverConnection);
+				}
+				catch (ThreadInterruptedException)
+				{
+					//Catching twice for safety
+				}
+
+				//This thread is about to terminate, we don't need a reference to it anymore.
+				lock (connectionThread!)
+				{
+					if (connectionThread == Thread.CurrentThread)
+					{
+						connectionThread = null;
+					}
+				}
+			}
 		}
 	}
 
@@ -101,6 +208,8 @@ namespace BoredWithFriends.Network
 	/// </summary>
 	internal abstract class NetworkHandler
 	{
+		private readonly string handlerName;
+
 		/// <summary>
 		/// A Queue of Connections that have been registered to this handler.
 		/// </summary>
@@ -118,12 +227,44 @@ namespace BoredWithFriends.Network
 		/// This Thread is declared as a Background Thread; it will not keep
 		/// the application open if all foreground threads have halted.
 		/// </summary>
-		private readonly Thread dispatchThread;
+		private Thread? dispatchThread;
+
+		private Tuple<bool, bool> isStartedAndIsStopping = new(false, false);
 
 		/// <summary>
 		/// Tracks if this handler has been started or not.
 		/// </summary>
-		protected bool isStarted = false;
+		protected bool IsStarted
+		{
+			get
+			{
+				return isStartedAndIsStopping.Item1;
+			}
+
+			set
+			{
+				lock (isStartedAndIsStopping)
+				{
+					isStartedAndIsStopping = new(value, isStartedAndIsStopping.Item2);
+				}
+			}
+		}
+
+		private bool IsStopping
+		{
+			get
+			{
+				return isStartedAndIsStopping.Item2;
+			}
+
+			set
+			{
+				lock (isStartedAndIsStopping)
+				{
+					isStartedAndIsStopping = new(isStartedAndIsStopping.Item1, value);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Base constructor which takes a <paramref name="handlerName"/> for the thread this implementation
@@ -135,9 +276,12 @@ namespace BoredWithFriends.Network
 		/// <param name="handlerName"></param>
 		public NetworkHandler(string handlerName)
 		{
-			dispatchThread = new(new ThreadStart(ReadWriteDispatch));
-			dispatchThread.Name = $"{handlerName} Read/Write Dispatcher";
-			dispatchThread.IsBackground = true;
+			this.handlerName = handlerName;
+		}
+
+		~NetworkHandler()
+		{
+			Stop();
 		}
 
 		/// <summary>
@@ -149,11 +293,7 @@ namespace BoredWithFriends.Network
 		public void AddConnection(Connection con)
 		{
 			connections.Enqueue(con);
-
-			if ((dispatchThread.ThreadState & System.Threading.ThreadState.Unstarted) > 0)
-			{
-				StartDispatchThread();
-			}
+			StartDispatchThread();
 		}
 
 		/// <summary>
@@ -172,19 +312,36 @@ namespace BoredWithFriends.Network
 		/// Starts this handler's separate threads; this begins the handling of
 		/// networking aspects that have been registered.
 		/// <br></br><br></br>
-		/// Subclasses should check <see cref="isStarted"/> before performing any
+		/// Subclasses should check <see cref="IsStarted"/> before performing any
 		/// operations that interact with other threads. The base implementation
-		/// locks on itself before setting <see cref="isStarted"/> to true as a
+		/// locks on itself before setting <see cref="IsStarted"/> to true as a
 		/// precaution.
 		/// </summary>
 		public virtual void Start()
 		{
 			lock (this)
 			{
-				if (!isStarted)
+				while (IsStopping)
 				{
-					isStarted = true;
+					Thread.Sleep(5);
+				}
+
+				if (!IsStarted)
+				{
+					IsStarted = true;
 					StartDispatchThread();
+				}
+			}
+		}
+
+		public virtual void Stop()
+		{
+			lock (this)
+			{
+				if (IsStarted)
+				{
+					IsStopping = true;
+					dispatchThread!.Interrupt();
 				}
 			}
 		}
@@ -194,7 +351,13 @@ namespace BoredWithFriends.Network
 		/// </summary>
 		protected void StartDispatchThread()
 		{
-			dispatchThread.Start();
+			if (dispatchThread is null)
+			{
+				dispatchThread = new(new ThreadStart(ReadWriteDispatch));
+				dispatchThread.Name = $"{handlerName} Read/Write Dispatcher";
+				dispatchThread.IsBackground = true;
+				dispatchThread.Start();
+			}
 		}
 
 		/// <summary>
@@ -206,58 +369,109 @@ namespace BoredWithFriends.Network
 		/// </summary>
 		private void ReadWriteDispatch()
 		{
-			Stopwatch stopwatch = new();
-			while (true)
+			try
+			{
+				Stopwatch stopwatch = new();
+				while (true)
+				{
+					try
+					{
+						//If an exception happened
+						if (stopwatch.ElapsedMilliseconds < 75)
+						{
+							/*
+							 * Let the thread rest some. This isn't strictly necessary;
+							 * I just don't want this thread to be going full bore if
+							 * something goes wrong.
+							 */
+							Thread.Sleep((int) (80 - stopwatch.ElapsedMilliseconds));
+						}
+
+						stopwatch.Restart();
+
+						//Read if possible
+						for (int i = 0, count = connections.Count; i < count; i++)
+						{
+							if (connections.TryDequeue(out Connection? con))
+							{
+								if (con.IsOpen() && (BasePacket.Recieve(con) || con.IsOpen()))
+								{
+									//If the connection is open, and it wasn't rejected by BasePacket.Recieve
+									//Then add it back to the queue; otherwise, abandon it.
+									connections.Enqueue(con);
+								}
+							}
+						}
+
+						//Write if necessary
+						for (int i = 0, count = packetsToSend.Count; i < count; i++)
+						{
+							if (packetsToSend.TryDequeue(out Tuple<Connection, BasePacket>? tuple))
+							{
+								if (!BasePacket.Send(tuple.Item1, tuple.Item2))
+								{
+									//Try again next time
+									packetsToSend.Enqueue(tuple);
+								}
+							}
+						}
+						int sleepTime = (int) (80 - stopwatch.ElapsedMilliseconds);
+						Thread.Sleep(sleepTime > 0 ? sleepTime : 20);
+					}
+					catch (ThreadInterruptedException)
+					{
+						break;
+					}
+					catch
+					{
+						//This is a safety net. This thread must not crash.
+						Debug.Fail($"The Dispatch Thread <{Thread.CurrentThread.Name}> encountered an unknown problem!");
+					}
+				}
+			}
+			catch (ThreadInterruptedException)
+			{
+				//Catching twice for safety
+			}
+			lock (isStartedAndIsStopping)
 			{
 				try
 				{
-					//If an exception happened
-					if (stopwatch.ElapsedMilliseconds < 75)
+					while (connections.TryDequeue(out Connection? con))
 					{
-						/*
-						 * Let the thread rest some. This isn't strictly necessary;
-						 * I just don't want this thread to be going full bore if
-						 * something goes wrong.
-						 */
-						Thread.Sleep((int) (80 - stopwatch.ElapsedMilliseconds));
-					}
-
-					stopwatch.Restart();
-
-					//Read if possible
-					for (int i = 0, count = connections.Count; i < count; i++)
-					{
-						if (connections.TryDequeue(out Connection? con))
+						if (con.IsOpen())
 						{
-							if (con.IsOpen() && (BasePacket.Recieve(con) || con.IsOpen()))
-							{
-								//If the connection is open, and it wasn't rejected by BasePacket.Recieve
-								//Then add it back to the queue; otherwise, abandon it.
-								connections.Enqueue(con);
-							}
+							con.Close();
 						}
 					}
 
-					//Write if necessary
-					for (int i = 0, count = packetsToSend.Count; i < count; i++)
+					while (packetsToSend.TryDequeue(out Tuple<Connection, BasePacket>? tuple))
 					{
-						if (packetsToSend.TryDequeue(out Tuple<Connection, BasePacket>? tuple))
+						if (tuple.Item1.IsOpen())
 						{
-							if (!BasePacket.Send(tuple.Item1, tuple.Item2))
-							{
-								//Try again next time
-								packetsToSend.Enqueue(tuple);
-							}
+							tuple.Item1.Close();
 						}
 					}
-					int sleepTime = (int) (80 - stopwatch.ElapsedMilliseconds);
-					Thread.Sleep(sleepTime > 0 ? sleepTime : 20);
 				}
 				catch
 				{
-					//This is a safety net. This thread must not crash.
-					Debug.Fail($"The Dispatch Thread <{Thread.CurrentThread.Name}> encountered an unknown problem!");
+					//Leave it to the GC, I guess...
+					connections.Clear();
+					packetsToSend.Clear();
 				}
+
+
+				//Thread is about to exit, we don't need a reference to it anymore.
+				lock (dispatchThread!)
+				{
+					if (dispatchThread == Thread.CurrentThread)
+					{
+						dispatchThread = null;
+					}
+				}
+
+				IsStarted = false;
+				IsStopping = false;
 			}
 		}
 	}
