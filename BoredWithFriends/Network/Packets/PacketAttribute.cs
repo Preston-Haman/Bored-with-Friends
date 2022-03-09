@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -67,7 +68,9 @@ namespace BoredWithFriends.Network.Packets
 			{
 				if (packetsByOpcode.TryGetValue(header.opcode, out Type? packet))
 				{
-					if (Activator.CreateInstance(packet) is BasePacket ret)
+					//Activator.CreateInstance(packet) can throw an exception if there isn't a paramless constructor.
+					//Requiring one seems silly, so...
+					if (FormatterServices.GetUninitializedObject(packet) is BasePacket ret)
 					{
 						return ret;
 					}
