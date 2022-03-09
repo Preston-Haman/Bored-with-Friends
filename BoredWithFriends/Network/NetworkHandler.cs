@@ -13,92 +13,6 @@ namespace BoredWithFriends.Network
 {
 	/// <summary>
 	/// An Implementation of <see cref="NetworkHandler"/> that acts as the network
-	/// management for this application when it is running as a server. A
-	/// <see cref="TcpListener"/> is used to listen for incoming connections;
-	/// this is done on a separate thread in a blocking fashion.
-	/// <br></br><br></br>
-	/// When this implementation is told to run in local mode, it will bind to
-	/// the machine's loopback address. When not in local mode, it will listen
-	/// on all available interfaces. In either case, port 7777 is used.
-	/// </summary>
-	internal class ServerNetworkHandler : NetworkHandler
-	{
-		/// <summary>
-		/// The <see cref="TcpListener"/> that will listen for incoming conections.
-		/// </summary>
-		private readonly TcpListener server;
-
-		/// <summary>
-		/// The Thread that <see cref="server"/> will listen on.
-		/// </summary>
-		private Thread? listener;
-
-		/// <summary>
-		/// Creates a new <see cref="ServerNetworkHandler"/>. It will not be started
-		/// until a call to <see cref="Start"/> is made.
-		/// </summary>
-		/// <param name="localMode">If true, this will run in a local mode on the loopback
-		/// address of the running machine.</param>
-		public ServerNetworkHandler(int port = 7777, bool localMode = false) : base("Server")
-		{
-			server = localMode ? new TcpListener(IPAddress.Loopback, port) : new TcpListener(IPAddress.Any, port);
-		}
-
-		~ServerNetworkHandler()
-		{
-			Stop();
-		}
-
-		/// <inheritdoc/>
-		public override void Start()
-		{
-			if (!IsStarted)
-			{
-				base.Start();
-				listener = new(new ThreadStart(ListenForConnections));
-				listener.Name = "Server Connection Listener";
-				listener.IsBackground = true;
-				listener.Start();
-			}
-		}
-
-		/// <inheritdoc/>
-		public override void Stop()
-		{
-			if (IsStarted)
-			{
-				listener!.Interrupt();
-				base.Stop();
-			}
-		}
-
-		/// <summary>
-		/// Starts <see cref="server"/> and begins listening for incoming connections
-		/// on an infinite loop. When new connections are accepted, they are then registered
-		/// via <see cref="NetworkHandler.AddConnection"/>.
-		/// </summary>
-		protected void ListenForConnections()
-		{
-			try
-			{
-				server.Start();
-				while (true)
-				{
-					ClientConnection con = new(server.AcceptTcpClient());
-					AddConnection(con);
-					//TODO: Send packet out on con asking for handshake.
-				}
-			}
-			catch (ThreadInterruptedException)
-			{
-				//Shutdown.
-				server.Stop();
-			}
-		}
-	}
-
-	/// <summary>
-	/// An Implementation of <see cref="NetworkHandler"/> that acts as the network
 	/// management for this application when it is running as a client.
 	/// </summary>
 	internal class ClientNetworkHandler : NetworkHandler
@@ -235,6 +149,92 @@ namespace BoredWithFriends.Network
 						connectionThread = null;
 					}
 				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// An Implementation of <see cref="NetworkHandler"/> that acts as the network
+	/// management for this application when it is running as a server. A
+	/// <see cref="TcpListener"/> is used to listen for incoming connections;
+	/// this is done on a separate thread in a blocking fashion.
+	/// <br></br><br></br>
+	/// When this implementation is told to run in local mode, it will bind to
+	/// the machine's loopback address. When not in local mode, it will listen
+	/// on all available interfaces. In either case, port 7777 is used.
+	/// </summary>
+	internal class ServerNetworkHandler : NetworkHandler
+	{
+		/// <summary>
+		/// The <see cref="TcpListener"/> that will listen for incoming conections.
+		/// </summary>
+		private readonly TcpListener server;
+
+		/// <summary>
+		/// The Thread that <see cref="server"/> will listen on.
+		/// </summary>
+		private Thread? listener;
+
+		/// <summary>
+		/// Creates a new <see cref="ServerNetworkHandler"/>. It will not be started
+		/// until a call to <see cref="Start"/> is made.
+		/// </summary>
+		/// <param name="localMode">If true, this will run in a local mode on the loopback
+		/// address of the running machine.</param>
+		public ServerNetworkHandler(int port = 7777, bool localMode = false) : base("Server")
+		{
+			server = localMode ? new TcpListener(IPAddress.Loopback, port) : new TcpListener(IPAddress.Any, port);
+		}
+
+		~ServerNetworkHandler()
+		{
+			Stop();
+		}
+
+		/// <inheritdoc/>
+		public override void Start()
+		{
+			if (!IsStarted)
+			{
+				base.Start();
+				listener = new(new ThreadStart(ListenForConnections));
+				listener.Name = "Server Connection Listener";
+				listener.IsBackground = true;
+				listener.Start();
+			}
+		}
+
+		/// <inheritdoc/>
+		public override void Stop()
+		{
+			if (IsStarted)
+			{
+				listener!.Interrupt();
+				base.Stop();
+			}
+		}
+
+		/// <summary>
+		/// Starts <see cref="server"/> and begins listening for incoming connections
+		/// on an infinite loop. When new connections are accepted, they are then registered
+		/// via <see cref="NetworkHandler.AddConnection"/>.
+		/// </summary>
+		protected void ListenForConnections()
+		{
+			try
+			{
+				server.Start();
+				while (true)
+				{
+					ClientConnection con = new(server.AcceptTcpClient());
+					AddConnection(con);
+					//TODO: Send packet out on con asking for handshake.
+				}
+			}
+			catch (ThreadInterruptedException)
+			{
+				//Shutdown.
+				server.Stop();
 			}
 		}
 	}
