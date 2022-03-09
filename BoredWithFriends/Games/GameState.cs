@@ -46,6 +46,17 @@ namespace BoredWithFriends.Games
 		{
 			return Name;
 		}
+
+		/// <summary>
+		/// If this player is a guest, then this method returns the hash of this Player's name.
+		/// If this player is not a guest, then this method returns the <see cref="PlayerID"/>
+		/// of this player.
+		/// </summary>
+		/// <returns></returns>
+		public override int GetHashCode()
+		{
+			return PlayerID == -1 ? Name.GetHashCode() : PlayerID;
+		}
 	}
 
 	/// <summary>
