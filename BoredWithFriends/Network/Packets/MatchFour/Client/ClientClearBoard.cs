@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.MatchFour.Client
 {
-	[Packet(typeof(ClientClearBoard), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ClearBoard)]
+	[Packet(typeof(ClientClearBoard), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ClientClearBoard)]
 	internal class ClientClearBoard : ClientPacket
 	{
 		public ClientClearBoard()
