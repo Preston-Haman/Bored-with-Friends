@@ -20,7 +20,7 @@ namespace BoredWithFriends.Network
 		/// <summary>
 		/// A reference to the server connection being used by this client.
 		/// </summary>
-		private ServerConnection? serverConnection = null;
+		public ServerConnection? Connection { get; private set; } = null;
 
 		/// <summary>
 		/// A reference to the thread that will attempt to connect
@@ -55,7 +55,7 @@ namespace BoredWithFriends.Network
 		/// </summary>
 		public override void Start()
 		{
-			if (serverConnection is not null)
+			if (Connection is not null)
 			{
 				base.Start();
 			}
@@ -85,10 +85,10 @@ namespace BoredWithFriends.Network
 					connectionThread.Interrupt();
 				}
 
-				if (serverConnection is not null)
+				if (Connection is not null)
 				{
-					serverConnection.Close();
-					serverConnection = null;
+					Connection.Close();
+					Connection = null;
 				}
 			}
 		}
@@ -114,12 +114,12 @@ namespace BoredWithFriends.Network
 			{
 				try
 				{
-					while (serverConnection is null)
+					while (Connection is null)
 					{
 						try
 						{
 							//This is a blocking call
-							serverConnection = new(serverIP, port);
+							Connection = new(serverIP, port);
 						}
 						catch (ThreadInterruptedException)
 						{
@@ -133,7 +133,7 @@ namespace BoredWithFriends.Network
 							Thread.Sleep(100);
 						}
 					}
-					AddConnection(serverConnection);
+					AddConnection(Connection);
 					//TODO: Send packet out on serverConncetion asking for handshake.
 				}
 				catch (ThreadInterruptedException)
@@ -239,6 +239,35 @@ namespace BoredWithFriends.Network
 		}
 	}
 
+	internal class LocalNetworkHandler : NetworkHandler
+	{
+		public LocalNetworkHandler() : base("Local")
+		{
+			//Nothing to do.
+		}
+
+		public override void Start()
+		{
+			//Don't start anything.
+		}
+
+		public override void Stop()
+		{
+			//We didn't start anything.
+		}
+
+		public override void SendPacket(Connection con, BasePacket packet)
+		{
+			if (con is not LocalConnection localCon)
+			{
+				throw new ArgumentException($"The conection must be a local connection for {nameof(LocalNetworkHandler)}.", nameof(con));
+			}
+
+			BasePacket.RunLocally(packet, localCon);
+		}
+
+	}
+
 	/// <summary>
 	/// A base class for handling <see cref="Connection"/> and <see cref="BasePacket"/> classes.
 	/// <br></br><br></br>
@@ -337,7 +366,7 @@ namespace BoredWithFriends.Network
 		/// If the <see cref="dispatchThread"/> has not been started, it will be.
 		/// </summary>
 		/// <param name="con">The connection to register.</param>
-		public void AddConnection(Connection con)
+		protected void AddConnection(Connection con)
 		{
 			connections.Enqueue(con);
 			StartDispatchThread();
@@ -350,7 +379,7 @@ namespace BoredWithFriends.Network
 		/// </summary>
 		/// <param name="con">The connection to write the <paramref name="packet"/> out to.</param>
 		/// <param name="packet">The packet to write out on <paramref name="con"/>.</param>
-		public void SendPacket(Connection con, BasePacket packet)
+		public virtual void SendPacket(Connection con, BasePacket packet)
 		{
 			packetsToSend.Enqueue(new Tuple<Connection, BasePacket>(con, packet));
 		}
