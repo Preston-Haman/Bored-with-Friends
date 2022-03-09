@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace BoredWithFriends.Network.Packets.General.Server
 {
 	[Packet(typeof(ServerApprovePasswordUpdate), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerApprovePasswordUpdate)]
-	internal class ServerApprovePasswordUpdate : ClientPacket
+	internal class ServerApprovePasswordUpdate : ServerPacket
 	{
 		protected override void ReadImpl()
 		{
 			throw new NotImplementedException();
 		}
 
-		protected override void RunImpl(Connection con)
+		protected override void RunImpl()
 		{
 			throw new NotImplementedException();
 		}
