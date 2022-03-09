@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.MatchFour.Server
 {
-	[Packet(typeof(ServerSendBoardState), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.SendBoardState)]
+	[Packet(typeof(ServerSendBoardState), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ServerSendBoardState)]
 	internal class ServerSendBoardState : ServerPacket
 	{
 		protected override void ReadImpl()

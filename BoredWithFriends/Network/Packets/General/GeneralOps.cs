@@ -9,26 +9,24 @@ namespace BoredWithFriends.Network.Packets.General
 	internal enum GeneralOps
 	{
 		//Client Ops
-		Connect,
-		CreateAccount,
-		Login,
-		AccountManagement,
-		UpdatePassword,
-		DeleteAccount,
-		SelectGame,
-		Disconnect,
+		ClientConnect,
+		ClientLogin,
+		ClientAccountManagement,
+		ClientUpdatePassword,
+		ClientDeleteAccount,
+		ClientSelectGame,
+		ClientDisconnect,
 
 		//Server Ops
-		Connected,
-		ApproveAccount,
-		ApproveLogin,
-		SendAccountDetails,
-		ApprovePasswordUpdate,
-		AccountDeleted,
-		EnterGameLobby,
-		AddPlayer,
-		AddSpectator,
-		StartGame,
-		CloseConnection
+		ServerConnected,
+		ServerApproveLogin,
+		ServerSendAccountDetails,
+		ServerApprovePasswordUpdate,
+		ServerAccountDeleted,
+		ServerEnterGameLobby,
+		ServerAddPlayer,
+		ServerAddSpectator,
+		ServerStartGame,
+		ServerCloseConnection
 	}
 }
