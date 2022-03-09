@@ -9,13 +9,13 @@ namespace BoredWithFriends.Network.Packets.MatchFour
 	internal enum MatchFourOps : short
 	{
 		//Client Ops
-		RequestBoardState,
-		PlayToken,
-		ClearBoard,
+		ClientRequestBoardState,
+		ClientPlayToken,
+		ClientClearBoard,
 
 		//Server Ops
-		SendBoardState,
-		TokenPlayed,
-		BoardCleared,
+		ServerSendBoardState,
+		ServerTokenPlayed,
+		ServerBoardCleared,
 	}
 }
