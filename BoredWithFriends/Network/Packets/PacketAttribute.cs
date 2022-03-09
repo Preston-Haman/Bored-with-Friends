@@ -13,13 +13,15 @@ namespace BoredWithFriends.Network.Packets
 
 		public short Opcode { get; }
 
+		public ConnectionState ValidState { get; }
+
 		/// <summary>
 		/// Marks the using class as an implementation of <see cref="BasePacket"/>. You must also
 		/// declare <see cref="ProtocolAttribute"/> and <see cref="OpcodeAttribute"/>.
 		/// </summary>
 		/// <param name="classType">The <see cref="Type"/> of the class using this attribute.</param>
 		/// <exception cref="ArgumentException">If <paramref name="classType"/> is not a subclass of <see cref="BasePacket"/></exception>
-		public PacketAttribute(Type classType, BoredWithFriendsProtocol protocol, short opcode)
+		public PacketAttribute(Type classType, BoredWithFriendsProtocol protocol, short opcode, ConnectionState validState = ConnectionState.Authed)
 		{
 			if (!classType.IsSubclassOf(typeof(BasePacket)))
 			{
@@ -36,6 +38,8 @@ namespace BoredWithFriends.Network.Packets
 			Opcode = opcode;
 
 			RegisterPacket(classType, Protocol, Opcode);
+
+			ValidState = validState;
 		}
 
 		private static readonly Dictionary<short, Dictionary<short, Type>> REGISTERED_PACKETS = new();

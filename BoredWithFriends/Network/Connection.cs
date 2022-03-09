@@ -126,6 +126,38 @@ namespace BoredWithFriends.Network
 	}
 
 	/// <summary>
+	/// Represents the state of a <see cref="Connection"/>. State in this case does not
+	/// refer to the status of the network connection; rather, it refers to the state
+	/// of the source of the connection.
+	/// <br></br><br></br>
+	/// The source of any given connection is unknown until communication with it occurs.
+	/// After establishing communication, the source can be identified as a Bored with Friends
+	/// application (or at least an application that mimics the network protocol), and in the
+	/// case of a player, may login to an account. These three states are represented by
+	/// the named values of this enum:
+	/// <list type="bullet"><see cref="Unknown"/></list>
+	/// <list type="bullet"><see cref="Handshook"/></list>
+	/// <list type="bullet"><see cref="Authed"/></list>
+	/// </summary>
+	internal enum ConnectionState : byte
+	{
+		/// <summary>
+		/// The <see cref="Connection"/> is to an Unknown source.
+		/// </summary>
+		Unknown = 1,
+
+		/// <summary>
+		/// The <see cref="Connection"/> is likely to a Bored with Friends Application.
+		/// </summary>
+		Handshook = 1 << 1,
+		
+		/// <summary>
+		/// The <see cref="Connection"/> is to an Authorized player/server.
+		/// </summary>
+		Authed = 1 << 2
+	}
+
+	/// <summary>
 	/// A base class for connections; this class and subclasses are responsible for handling
 	/// the network.
 	/// 
@@ -140,12 +172,48 @@ namespace BoredWithFriends.Network
 		protected TcpClient client;
 
 		/// <summary>
+		/// The state of what's known about this connection's source. This can be used to filter packets
+		/// from entities that should not be allowed to send them on this connection.
+		/// </summary>
+		protected ConnectionState connectionState = ConnectionState.Unknown;
+
+		/// <summary>
 		/// Creates a <see cref="Connection"/> with the given <see cref="TcpClient"/>.
 		/// </summary>
 		/// <param name="client">A <see cref="TcpClient"/> for this <see cref="Connection"/></param>
 		public Connection(TcpClient client)
 		{
 			this.client = client;
+		}
+
+		/// <summary>
+		/// Adjust this connection's <see cref="connectionState"/> to match the given
+		/// <paramref name="state"/>.
+		/// </summary>
+		/// <param name="state">The new <see cref="ConnectionState"/> to set this
+		/// conection to.</param>
+		public void SetConnectionState(ConnectionState state)
+		{
+			connectionState = state;
+		}
+
+		/// <summary>
+		/// Checks if <see cref="connectionState"/> matches any of the given <paramref name="states"/>.
+		/// If so, returns true; otherwise, false.
+		/// </summary>
+		/// <param name="states">A list of states to check for.</param>
+		/// <returns>True if any of the given <paramref name="states"/> match the current <see cref="connectionState"/>.</returns>
+		public bool MatchesAnyConnectionState(params ConnectionState[] states)
+		{
+			//ConnectionState is not meant to be a flag enum, but the values map like one.
+			//That lets callers specify a list of states to match.
+			int flags = 0;
+			foreach (ConnectionState state in states)
+			{
+				flags |= (int) state;
+			}
+
+			return ((int) connectionState & flags) == 1;
 		}
 
 		/// <summary>
