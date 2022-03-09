@@ -23,13 +23,17 @@ namespace BoredWithFriends.Network
 
 		public static GameState? LocalGameState { get; set; }
 
-		public static void StartServer(LocalNetworkHandler? localHandler)
+		public static void StartServer(NetworkHandler handler)
 		{
 			if (!isStarted)
 			{
-				isLocal = localHandler is not null;
-				serverNetworkHandler = isLocal ? localHandler! : new ServerNetworkHandler();
+				isLocal = handler is LocalNetworkHandler;
+
+				serverNetworkHandler = handler;
 				serverNetworkHandler.Start();
+
+				PacketSendUtility.NetHandler = handler;
+
 				isStarted = true;
 			}
 		}
