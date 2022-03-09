@@ -118,14 +118,26 @@ namespace BoredWithFriends.Network.Packets
 		}
 	}
 
+	/// <summary>
+	/// This is a packet that was sent from a client.
+	/// </summary>
 	internal abstract class ClientPacket : BasePacket
 	{
-		//Eventually this might have some client specific aspects
+		//Server probably needs to know which connection is sending the packet...!
+		protected override abstract void RunImpl(Connection con);
+
+		protected override void RunImpl()
+		{
+			//Do nothing.
+		}
 	}
 
+	/// <summary>
+	/// This is a packet that was sent from the server.
+	/// </summary>
 	internal abstract class ServerPacket : BasePacket
 	{
-		//Eventually this might have some server specific aspects
+		//Eventually this might have some server packet specific aspects
 	}
 
 	/// <summary>
@@ -315,9 +327,11 @@ namespace BoredWithFriends.Network.Packets
 
 		/// <summary>
 		/// This method is for subclasses that might need access to the Connection
-		/// for this packet while acting upon the data. It's unlikely that this
-		/// will be necessary in any given subclass implementation, but it
-		/// will be here on the off chance that it is.
+		/// for this packet while acting upon the data. Packets that run on the
+		/// server side may wish to have access to the connection in order to
+		/// identify the source user. Packets that run on the server side
+		/// are unlikely to need the same access, but this method will be here
+		/// for that case, too.
 		/// <br></br><br></br>
 		/// The default implementation merely calls <see cref="RunImpl()"/>, which
 		/// should be sufficient for the majority of subclass implementations.

@@ -10,11 +10,6 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Server
 	[Packet(typeof(ServerTokenPlayed), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ServerTokenPlayed)]
 	internal class ServerTokenPlayed : ServerPacket
 	{
-		public ServerTokenPlayed()
-		{
-			//For reflection
-		}
-
 		private int row;
 
 		private int column;

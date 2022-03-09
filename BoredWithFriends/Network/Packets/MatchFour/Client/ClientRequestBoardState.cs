@@ -9,17 +9,12 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Client
 	[Packet(typeof(ClientRequestBoardState), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ClientRequestBoardState)]
 	internal class ClientRequestBoardState : ClientPacket
 	{
-		public ClientRequestBoardState()
-		{
-			//For reflection
-		}
-
 		protected override void ReadImpl()
 		{
 			//Nothing to do.
 		}
 
-		protected override void RunImpl()
+		protected override void RunImpl(Connection con)
 		{
 			//TODO: Reply with SendBoardState
 			throw new NotImplementedException();
