@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.MatchFour.Client
 {
-	[Packet(typeof(ClientPlayToken), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.PlayToken)]
+	[Packet(typeof(ClientPlayToken), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ClientPlayToken)]
 	internal class ClientPlayToken : ClientPacket
 	{
 		public ClientPlayToken()
