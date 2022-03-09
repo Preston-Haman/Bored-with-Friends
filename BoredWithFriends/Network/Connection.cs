@@ -14,7 +14,7 @@ namespace BoredWithFriends.Network
 	/// <br></br><br></br>
 	/// It's important to note that this connection may not be a legitimate user of this
 	/// application. There is a chance that some service is scanning for open ports and
-	/// they made a conection to us. These connection objects are short lived; they are
+	/// they made a connection to us. These connection objects are short lived; they are
 	/// either replaced with a <see cref="PlayerConnection"/>, or rejected.
 	/// </summary>
 	internal class ClientConnection : Connection
@@ -208,7 +208,7 @@ namespace BoredWithFriends.Network
 		/// <paramref name="state"/>.
 		/// </summary>
 		/// <param name="state">The new <see cref="ConnectionState"/> to set this
-		/// conection to.</param>
+		/// connection to.</param>
 		public void SetConnectionState(ConnectionState state)
 		{
 			connectionState = state;
