@@ -482,9 +482,9 @@ namespace BoredWithFriends.Network
 						{
 							if (connections.TryDequeue(out Connection? con))
 							{
-								if (con.IsOpen() && (BasePacket.Recieve(con) || con.IsOpen()))
+								if (con.IsOpen() && (BasePacket.Receive(con) || con.IsOpen()))
 								{
-									//If the connection is open, and it wasn't rejected by BasePacket.Recieve
+									//If the connection is open, and it wasn't rejected by BasePacket.Receive
 									//Then add it back to the queue; otherwise, abandon it.
 									connections.Enqueue(con);
 								}

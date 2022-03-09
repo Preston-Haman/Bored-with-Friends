@@ -207,7 +207,7 @@ namespace BoredWithFriends.Network.Packets
 		/// </summary>
 		/// <param name="con">The <see cref="Connection"/> with an incoming packet.</param>
 		/// <returns>True if successful, false otherwise.</returns>
-		public static bool Recieve(Connection con)
+		public static bool Receive(Connection con)
 		{
 			//TODO: Should probably handle this better...
 			try
@@ -331,10 +331,12 @@ namespace BoredWithFriends.Network.Packets
 		protected abstract void WriteImpl();
 
 		/// <summary>
+		/// Acts on the information contained within this packet.
+		/// <br></br><br></br>
 		/// This method is for subclasses that might need access to the Connection
 		/// for this packet while acting upon the data. Packets that run on the
 		/// server side may wish to have access to the connection in order to
-		/// identify the source user. Packets that run on the server side
+		/// identify the source user. Packets that run on the client side
 		/// are unlikely to need the same access, but this method will be here
 		/// for that case, too.
 		/// <br></br><br></br>
