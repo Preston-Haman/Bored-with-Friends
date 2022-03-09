@@ -9,17 +9,12 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Client
 	[Packet(typeof(ClientClearBoard), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ClientClearBoard)]
 	internal class ClientClearBoard : ClientPacket
 	{
-		public ClientClearBoard()
-		{
-			//For reflection
-		}
-
 		protected override void ReadImpl()
 		{
 			//Nothing to do.
 		}
 
-		protected override void RunImpl()
+		protected override void RunImpl(Connection con)
 		{
 			//TODO: Get gamestate for this packet and forfeit this player; reply with BoardCleared
 			throw new NotImplementedException();
