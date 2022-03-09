@@ -246,6 +246,11 @@ namespace BoredWithFriends.Network.Packets
 			}
 		}
 
+		public static void RunLocally(BasePacket packet, LocalConnection con)
+		{
+			packet.RunImpl(con);
+		}
+
 		/// <summary>
 		/// Validates that the packet header matches this packet implementation, and then reads all
 		/// data from the <paramref name="buffer"/>.
