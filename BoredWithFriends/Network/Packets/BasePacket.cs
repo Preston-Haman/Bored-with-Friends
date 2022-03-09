@@ -156,6 +156,7 @@ namespace BoredWithFriends.Network.Packets
 		/// <paramref name="buffer"/>.</returns>
 		private static PacketHeader ExamineHeader(Connection con, out ByteArrayStream buffer)
 		{
+			//TODO: This implementation is likely to cause problems later...
 			PacketHeader header = new(con.Peek(PacketHeader.HEADER_SIZE));
 
 			buffer = new(con.Read(header.size));
@@ -204,9 +205,17 @@ namespace BoredWithFriends.Network.Packets
 				try
 				{
 					packet = PacketAttribute.CreatePacket(header);
+
+					//This attribute must exist for the above method to return normally.
+					PacketAttribute? packetInfo = Attribute.GetCustomAttribute(packet.GetType(), typeof(PacketAttribute)) as PacketAttribute;
+					if (!con.MatchesAnyConnectionState(packetInfo!.ValidState))
+					{
+						throw new ArgumentException($"Connection has invalid connection state for packet: {con.GetType().Name}");
+					}
 				}
 				catch (ArgumentException)
 				{
+					//For clarity: this also catches the exception from the CreatePacket method call.
 					System.Diagnostics.Debug.WriteLine("A connection sent an invalid packet; discarding connection.");
 					con.Close();
 					return false;
@@ -237,6 +246,7 @@ namespace BoredWithFriends.Network.Packets
 		{
 			if (Attribute.GetCustomAttribute(this.GetType(), typeof(PacketAttribute)) is not PacketAttribute packetInfo)
 			{
+				//Shouldn't even be possible
 				throw new ProtocolException($"The packet {this.GetType().Name} does not declare either its protocol, its opcode, or both.");
 			}
 
