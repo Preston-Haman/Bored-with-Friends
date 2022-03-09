@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace BoredWithFriends.Network.Packets.General.Server
 {
 	[Packet(typeof(ServerAccountDeleted), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerAccountDeleted)]
-	internal class ServerAccountDeleted : ClientPacket
+	internal class ServerAccountDeleted : ServerPacket
 	{
 		protected override void ReadImpl()
 		{
 			throw new NotImplementedException();
 		}
 
-		protected override void RunImpl(Connection con)
+		protected override void RunImpl()
 		{
 			throw new NotImplementedException();
 		}
