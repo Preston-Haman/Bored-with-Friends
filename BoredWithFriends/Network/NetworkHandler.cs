@@ -134,6 +134,7 @@ namespace BoredWithFriends.Network
 						}
 					}
 					AddConnection(serverConnection);
+					//TODO: Send packet out on serverConncetion asking for handshake.
 				}
 				catch (ThreadInterruptedException)
 				{
@@ -228,7 +229,6 @@ namespace BoredWithFriends.Network
 				{
 					ClientConnection con = new(server.AcceptTcpClient());
 					AddConnection(con);
-					//TODO: Send packet out on con asking for handshake.
 				}
 			}
 			catch (ThreadInterruptedException)
