@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace BoredWithFriends.Network.Packets.General.Server
 {
 	[Packet(typeof(ServerApproveLogin), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerApproveLogin)]
-	internal class ServerApproveLogin : ServerPacket
+	internal class ServerApproveLogin : ClientPacket
 	{
 		protected override void ReadImpl()
 		{
 			throw new NotImplementedException();
 		}
 
-		protected override void RunImpl()
+		protected override void RunImpl(Connection con)
 		{
 			throw new NotImplementedException();
 		}

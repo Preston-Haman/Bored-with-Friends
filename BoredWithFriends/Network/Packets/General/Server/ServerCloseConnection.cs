@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace BoredWithFriends.Network.Packets.General.Server
 {
 	[Packet(typeof(ServerCloseConnection), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerCloseConnection)]
-	internal class ServerCloseConnection : ServerPacket
+	internal class ServerCloseConnection : ClientPacket
 	{
 		protected override void ReadImpl()
 		{
 			throw new NotImplementedException();
 		}
 
-		protected override void RunImpl()
+		protected override void RunImpl(Connection con)
 		{
 			throw new NotImplementedException();
 		}

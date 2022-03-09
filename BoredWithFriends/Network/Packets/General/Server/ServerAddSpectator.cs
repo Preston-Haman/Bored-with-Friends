@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace BoredWithFriends.Network.Packets.General.Server
 {
 	[Packet(typeof(ServerAddSpectator), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerAddSpectator)]
-	internal class ServerAddSpectator : ServerPacket
+	internal class ServerAddSpectator : ClientPacket
 	{
 		protected override void ReadImpl()
 		{
 			throw new NotImplementedException();
 		}
 
-		protected override void RunImpl()
+		protected override void RunImpl(Connection con)
 		{
 			throw new NotImplementedException();
 		}
