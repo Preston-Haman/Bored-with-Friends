@@ -203,7 +203,7 @@ namespace BoredWithFriends.Network.Packets
 				BasePacket packet;
 				try
 				{
-					packet = PacketLookup.CreatePacket(header);
+					packet = PacketAttribute.CreatePacket(header);
 				}
 				catch (ArgumentException)
 				{

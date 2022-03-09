@@ -6,43 +6,6 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets
 {
-	internal static class PacketLookup
-	{
-		private static readonly Dictionary<short, Dictionary<short, Type>> REGISTERED_PACKETS = new();
-
-		public static void RegisterPacket(Type packet, short protocol, short opcode)
-		{
-			if (!REGISTERED_PACKETS.ContainsKey(protocol))
-			{
-				REGISTERED_PACKETS.Add(protocol, new Dictionary<short, Type>());
-			}
-
-			if (REGISTERED_PACKETS.TryGetValue(protocol, out Dictionary<short, Type>? packetsByOpcode))
-			{
-				if (packetsByOpcode.ContainsKey(opcode))
-				{
-					throw new ArgumentException($"The {nameof(opcode)}: {opcode:x} for this {nameof(protocol)}: {protocol:x} is already in use.");
-				}
-				packetsByOpcode.Add(opcode, packet);
-			}
-		}
-
-		public static BasePacket CreatePacket(PacketHeader header)
-		{
-			if (REGISTERED_PACKETS.TryGetValue(header.protocol, out Dictionary<short, Type>? packetsByOpcode))
-			{
-				if (packetsByOpcode.TryGetValue(header.opcode, out Type? packet))
-				{
-					if (Activator.CreateInstance(packet) is BasePacket ret)
-					{
-						return ret;
-					}
-				}
-			}
-			throw new ArgumentException("The requested packet cannot be identified.");
-		}
-	}
-
 	[AttributeUsage(AttributeTargets.Class)]
 	internal class PacketAttribute : Attribute
 	{
@@ -72,7 +35,41 @@ namespace BoredWithFriends.Network.Packets
 
 			Opcode = opcode;
 
-			PacketLookup.RegisterPacket(classType, Protocol, Opcode);
+			RegisterPacket(classType, Protocol, Opcode);
+		}
+
+		private static readonly Dictionary<short, Dictionary<short, Type>> REGISTERED_PACKETS = new();
+
+		private static void RegisterPacket(Type packet, short protocol, short opcode)
+		{
+			if (!REGISTERED_PACKETS.ContainsKey(protocol))
+			{
+				REGISTERED_PACKETS.Add(protocol, new Dictionary<short, Type>());
+			}
+
+			if (REGISTERED_PACKETS.TryGetValue(protocol, out Dictionary<short, Type>? packetsByOpcode))
+			{
+				if (packetsByOpcode.ContainsKey(opcode))
+				{
+					throw new ArgumentException($"The {nameof(opcode)}: {opcode:x} for this {nameof(protocol)}: {protocol:x} is already in use.");
+				}
+				packetsByOpcode.Add(opcode, packet);
+			}
+		}
+
+		public static BasePacket CreatePacket(PacketHeader header)
+		{
+			if (REGISTERED_PACKETS.TryGetValue(header.protocol, out Dictionary<short, Type>? packetsByOpcode))
+			{
+				if (packetsByOpcode.TryGetValue(header.opcode, out Type? packet))
+				{
+					if (Activator.CreateInstance(packet) is BasePacket ret)
+					{
+						return ret;
+					}
+				}
+			}
+			throw new ArgumentException("The requested packet cannot be identified.");
 		}
 	}
 }
