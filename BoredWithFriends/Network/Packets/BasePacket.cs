@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 namespace BoredWithFriends.Network.Packets
 {
 	/// <summary>
-	/// An exception indicating that something has violated either the protocol definiton,
+	/// An exception indicating that something has violated either the protocol definition,
 	/// or some implementation specific detail.
 	/// </summary>
 	internal class ProtocolException : Exception
@@ -192,7 +193,7 @@ namespace BoredWithFriends.Network.Packets
 			}
 			catch (Exception e)
 			{
-				System.Diagnostics.Debug.Fail(e.ToString());
+				Debug.Fail($"{e.GetType().Name}: {e.Message}", e.StackTrace);
 				return false;
 			}
 		}
@@ -241,7 +242,7 @@ namespace BoredWithFriends.Network.Packets
 			}
 			catch (Exception e)
 			{
-				System.Diagnostics.Debug.Fail(e.ToString());
+				Debug.Fail($"{e.GetType().Name}: {e.Message}", e.StackTrace);
 				return false;
 			}
 		}
@@ -319,14 +320,14 @@ namespace BoredWithFriends.Network.Packets
 		/// <summary>
 		/// Reads information that is specific to this packet's implementation.
 		/// 
-		/// Implmentations may use the Read methods provided by <see cref="BasePacket"/>.
+		/// Implementations may use the Read methods provided by <see cref="BasePacket"/>.
 		/// </summary>
 		protected abstract void ReadImpl();
 
 		/// <summary>
 		/// Writes information that is specific to this packet's implementation.
 		/// 
-		/// Implmentations may use the Write methods provided by <see cref="BasePacket"/>.
+		/// Implementations may use the Write methods provided by <see cref="BasePacket"/>.
 		/// </summary>
 		protected abstract void WriteImpl();
 
