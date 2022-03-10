@@ -22,7 +22,7 @@ namespace BoredWithFriends.Data
 				UserName = userName,
 				Password = password,
 				//set playerstatistics ID and create related object with defaults
-				PlayerStatistics = new()
+				PlayerStatisticsID = new()
 			};
 
 			DatabaseContext database = new();
