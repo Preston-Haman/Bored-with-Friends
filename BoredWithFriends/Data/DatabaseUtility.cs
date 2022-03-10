@@ -35,7 +35,8 @@ namespace BoredWithFriends.Data
 		/// </summary>
 		/// <param name="userName">The userName to search for</param>
 		/// <returns>The PlayerLogin object containing that user name</returns>
-		public static PlayerLogin RetrievePlayerLogin(string userName)
+		/// /// <exception cref="ArgumentNullException">If a userName is not found in the PlayerLogin table</exception>
+		public static PlayerLogin GetPlayerLogin(string userName)
 		{
 			DatabaseContext database = new();
 
@@ -57,11 +58,11 @@ namespace BoredWithFriends.Data
 		/// Searches for a specific user in the PlayerStatistics table
 		/// </summary>
 		/// <param name="userName">The userName to search for</param>
-		/// <returns></returns>
-		/// <exception cref="ArgumentNullException"></exception>
-		public static PlayerStatistics RetreivePlayerStatistics(string userName)
+		/// <returns>The PlayerStatistics Object related to the userName from PlayerLogin table</returns>
+		/// <exception cref="ArgumentNullException">If a PlayerStatistics PlayerID is not found in the table</exception>
+		public static PlayerStatistics GetPlayerStatistics(string userName)
 		{
-			int PlayerID = RetrievePlayerLogin(userName).PlayerID;
+			int PlayerID = GetPlayerLogin(userName).PlayerID;
 
 			DatabaseContext database = new();
 			PlayerStatistics? userStats = (from statistics in database.PlayerStatistics
@@ -105,7 +106,7 @@ namespace BoredWithFriends.Data
 		/// <param name="password">The password to change to</param>
 		public static void UpdatePassword(string userName, string password)
 		{
-			PlayerLogin user = RetrievePlayerLogin(userName);
+			PlayerLogin user = GetPlayerLogin(userName);
 
 			user.Password = password;
 
@@ -116,7 +117,7 @@ namespace BoredWithFriends.Data
 
 		public static void DeleteUser(string userName)
 		{
-			PlayerLogin user = RetrievePlayerLogin(userName);
+			PlayerLogin user = GetPlayerLogin(userName);
 
 				DatabaseContext database = new();
 				database.Remove(user);
