@@ -62,12 +62,11 @@ namespace BoredWithFriends.Data
 		/// <exception cref="ArgumentNullException">If a PlayerStatistics PlayerID is not found in the table</exception>
 		public static PlayerStatistics GetPlayerStatistics(string userName)
 		{
-			int PlayerID = GetPlayerLogin(userName).PlayerID;
+			int playerID = GetPlayerLogin(userName).PlayerID;
 
 			DatabaseContext database = new();
-			PlayerStatistics? userStats = (from statistics in database.PlayerStatistics
-										   where statistics.PlayerID == PlayerID
-										   select statistics).SingleOrDefault();
+
+			PlayerStatistics? userStats = database.PlayerStatistics.Find(playerID);
 
 			if (userStats != null)
 			{
@@ -115,13 +114,19 @@ namespace BoredWithFriends.Data
 			database.SaveChangesAsync();
 		}
 
+		/// <summary>
+		/// Deletes all data in database under given userName
+		/// </summary>
+		/// <param name="userName"></param>
 		public static void DeleteUser(string userName)
 		{
 			PlayerLogin user = GetPlayerLogin(userName);
+			PlayerStatistics userStatistics = GetPlayerStatistics(userName);
 
-				DatabaseContext database = new();
-				database.Remove(user);
-				database.SaveChangesAsync();
+			DatabaseContext database = new();
+			database.Remove(user);
+			database.Remove(userStatistics);
+			database.SaveChangesAsync();
 		}
 	}
 }
