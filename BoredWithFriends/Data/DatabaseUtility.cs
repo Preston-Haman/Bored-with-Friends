@@ -21,7 +21,7 @@ namespace BoredWithFriends.Data
 			{
 				UserName = userName,
 				Password = password,
-				//auto generate playerstatistics ID with defaults
+				//set playerstatistics ID and create related object with defaults
 				PlayerStatistics = new()
 			};
 
@@ -31,11 +31,11 @@ namespace BoredWithFriends.Data
 		}
 
 		/// <summary>
-		/// Searches for a specific user name in the database
+		/// Searches for a specific user name in the PlayerLogin database
 		/// </summary>
-		/// <param name="userName">The UserName to search for</param>
+		/// <param name="userName">The userName to search for</param>
 		/// <returns>The PlayerLogin object containing that user name</returns>
-		public static PlayerLogin? RetrieveByUser(string userName)
+		public static PlayerLogin RetrievePlayerLogin(string userName)
 		{
 			DatabaseContext database = new();
 
@@ -43,9 +43,39 @@ namespace BoredWithFriends.Data
 								 where logins.UserName == userName
 								 select logins).SingleOrDefault();
 
-			CheckNull(user);
+			if (user != null)
+			{
+				return user;
+			}
+			else
+			{
+				throw new ArgumentNullException($"User name {userName} does not exist");
+			}
+		}
 
-			return user;
+		/// <summary>
+		/// Searches for a specific user in the PlayerStatistics table
+		/// </summary>
+		/// <param name="userName">The userName to search for</param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentNullException"></exception>
+		public static PlayerStatistics RetreivePlayerStatistics(string userName)
+		{
+			int PlayerID = RetrievePlayerLogin(userName).PlayerID;
+
+			DatabaseContext database = new();
+			PlayerStatistics? userStats = (from statistics in database.PlayerStatistics
+										   where statistics.PlayerID == PlayerID
+										   select statistics).SingleOrDefault();
+
+			if (userStats != null)
+			{
+				return userStats;
+			}
+			else
+			{
+				throw new ArgumentNullException($"No PlayerStatistics PlayerID under {userName}");
+			}
 		}
 
 		/// <summary>
@@ -75,7 +105,7 @@ namespace BoredWithFriends.Data
 		/// <param name="password">The password to change to</param>
 		public static void UpdatePassword(string userName, string password)
 		{
-			PlayerLogin? user = RetrieveByUser(userName);
+			PlayerLogin user = RetrievePlayerLogin(userName);
 
 			user.Password = password;
 
@@ -86,39 +116,11 @@ namespace BoredWithFriends.Data
 
 		public static void DeleteUser(string userName)
 		{
-			PlayerLogin? user = RetrieveByUser(userName);
+			PlayerLogin user = RetrievePlayerLogin(userName);
 
-			DatabaseContext? database = new();
-			database.Remove(user);
-			database.SaveChangesAsync();
-		}
-
-		public static PlayerStatistics RetreiveStats(string userName)
-		{
-			//TO DO: Create private retrieve by ID method
-			PlayerLogin? user = RetrieveByUser(userName);
-			int id = user.PlayerID;
-
-			CheckNull(user);
-
-			DatabaseContext database = new();
-			PlayerStatistics? userStats = (from statistics in database.PlayerStatistics
-										   where statistics.PlayerStatisticsID == id
-										   select statistics).SingleOrDefault();
-			return userStats;
-		}
-
-		/// <summary>
-		/// Checks if a username is null, and thows an ArgumentNulLexception if null.
-		/// </summary>
-		/// <param name="userName">The object to check if null</param>
-		/// <exception cref="ArgumentNullException">Notifies user no such user name exists</exception>
-		private static void CheckNull(Object userName)
-		{
-			if (userName == null)
-			{
-				throw new ArgumentNullException("No such user name exists");
-			}
+				DatabaseContext database = new();
+				database.Remove(user);
+				database.SaveChangesAsync();
 		}
 	}
 }
