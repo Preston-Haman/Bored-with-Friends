@@ -1,4 +1,5 @@
 ﻿using BoredWithFriends.Network.Packets;
+using BoredWithFriends.Network.Packets.General.Client;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ namespace BoredWithFriends.Network
 
 		/// <summary>
 		/// For <see cref="ClientNetworkHandler"/>, this will only start
-		/// the dispatch thread after a connecton has been established.
+		/// the dispatch thread after a connection has been established.
 		/// <br></br><br></br>
 		/// <inheritdoc/>
 		/// </summary>
@@ -124,24 +125,25 @@ namespace BoredWithFriends.Network
 						catch (ThreadInterruptedException)
 						{
 							//We failed to connect before the client gave up.
-							//Avoid adding null as a connection
-							goto ThreadEnd;
 						}
-						catch
+						catch (Exception e)
 						{
+							Debug.Fail($"{e.GetType().Name}: {e.Message}", e.StackTrace);
 							//Try again in a moment.
 							Thread.Sleep(100);
 						}
 					}
-					AddConnection(Connection);
-					//TODO: Send packet out on serverConncetion asking for handshake.
+					if (Connection is not null)
+					{
+						AddConnection(Connection);
+						PacketSendUtility.SendPacket(new ClientConnect());
+					}
 				}
 				catch (ThreadInterruptedException)
 				{
 					//Catching twice for safety
 				}
 
-			ThreadEnd:
 				//This thread is about to terminate, we don't need a reference to it anymore.
 				lock (connectionThread!)
 				{
@@ -167,7 +169,7 @@ namespace BoredWithFriends.Network
 	internal class ServerNetworkHandler : NetworkHandler
 	{
 		/// <summary>
-		/// The <see cref="TcpListener"/> that will listen for incoming conections.
+		/// The <see cref="TcpListener"/> that will listen for incoming connections.
 		/// </summary>
 		private readonly TcpListener server;
 
@@ -239,33 +241,51 @@ namespace BoredWithFriends.Network
 		}
 	}
 
+	/// <summary>
+	/// A pseudo network handler that runs the packets locally without sending them over the network.
+	/// </summary>
 	internal class LocalNetworkHandler : NetworkHandler
 	{
+		/// <summary>
+		/// Creates a <see cref="LocalNetworkHandler"/>.
+		/// </summary>
 		public LocalNetworkHandler() : base("Local")
 		{
 			//Nothing to do.
 		}
 
+		/// <summary>
+		/// Does nothing for <see cref="LocalNetworkHandler"/>.
+		/// </summary>
 		public override void Start()
 		{
 			//Don't start anything.
 		}
 
+		/// <summary>
+		/// Does nothing for <see cref="LocalNetworkHandler"/>.
+		/// </summary>
 		public override void Stop()
 		{
 			//We didn't start anything.
 		}
 
+		/// <summary>
+		/// Runs the given packet directly in a local context. The packet is not transmitted
+		/// over the network.
+		/// </summary>
+		/// <param name="con">A <see cref="LocalConnection"/> representing the current player.</param>
+		/// <param name="packet">The packet to execute.</param>
+		/// <exception cref="ArgumentException">If <paramref name="con"/> is not a <see cref="LocalConnection"/></exception>
 		public override void SendPacket(Connection con, BasePacket packet)
 		{
 			if (con is not LocalConnection localCon)
 			{
-				throw new ArgumentException($"The conection must be a local connection for {nameof(LocalNetworkHandler)}.", nameof(con));
+				throw new ArgumentException($"The connection must be a local connection for {nameof(LocalNetworkHandler)}.", nameof(con));
 			}
 
 			BasePacket.RunLocally(packet, localCon);
 		}
-
 	}
 
 	/// <summary>
@@ -277,6 +297,10 @@ namespace BoredWithFriends.Network
 	/// </summary>
 	internal abstract class NetworkHandler
 	{
+		/// <summary>
+		/// The name of this handler that will be prefixed onto the thread name for
+		/// the <see cref="dispatchThread"/>.
+		/// </summary>
 		private readonly string handlerName;
 
 		/// <summary>
@@ -482,9 +506,9 @@ namespace BoredWithFriends.Network
 						{
 							if (connections.TryDequeue(out Connection? con))
 							{
+								//If the connection is open, and it wasn't rejected by BasePacket.Receive
 								if (con.IsOpen() && (BasePacket.Receive(con) || con.IsOpen()))
 								{
-									//If the connection is open, and it wasn't rejected by BasePacket.Receive
 									//Then add it back to the queue; otherwise, abandon it.
 									connections.Enqueue(con);
 								}
@@ -510,10 +534,11 @@ namespace BoredWithFriends.Network
 					{
 						break;
 					}
-					catch
+					catch (Exception e)
 					{
 						//This is a safety net. This thread must not crash.
-						Debug.Fail($"The Dispatch Thread <{Thread.CurrentThread.Name}> encountered an unknown problem!");
+						Debug.Fail($"The Dispatch Thread <{Thread.CurrentThread.Name}> encountered a problem! " +
+							$"{e.GetType().Name}: {e.Message}", e.StackTrace);
 					}
 				}
 			}
@@ -542,9 +567,11 @@ namespace BoredWithFriends.Network
 						}
 					}
 				}
-				catch
+				catch (Exception e)
 				{
-					//Leave it to the GC, I guess...
+					Debug.Fail($"{e.GetType().Name}: {e.Message}", e.StackTrace);
+
+					//Leave cleaning up to the GC, I guess... the connections should eventually close.
 					connections.Clear();
 					packetsToSend.Clear();
 				}
