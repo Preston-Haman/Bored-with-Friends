@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.MatchFour.Client
 {
+	/// <summary>
+	/// Sent by the client when the player plays a token.
+	/// </summary>
 	[Packet(typeof(ClientPlayToken), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ClientPlayToken)]
 	internal class ClientPlayToken : ClientPacket
 	{

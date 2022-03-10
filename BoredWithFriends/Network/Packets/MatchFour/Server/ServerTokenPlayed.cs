@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BoredWithFriends.Games;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,9 @@ using static BoredWithFriends.Games.MatchFourGameState;
 
 namespace BoredWithFriends.Network.Packets.MatchFour.Server
 {
+	/// <summary>
+	/// Broadcast by the server when a player has made a move.
+	/// </summary>
 	[Packet(typeof(ServerTokenPlayed), BoredWithFriendsProtocol.MatchFour, (short) MatchFourOps.ServerTokenPlayed)]
 	internal class ServerTokenPlayed : ServerPacket
 	{
