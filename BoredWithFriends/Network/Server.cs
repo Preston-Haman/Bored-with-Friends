@@ -13,8 +13,6 @@ namespace BoredWithFriends.Network
 
 		private static readonly Dictionary<Player, GameState> playerGames = new();
 
-		private static readonly Dictionary<Player, GameState> spectatorGames = new();
-
 		private static NetworkHandler serverNetworkHandler = null!;
 
 		private static bool isStarted = false;
@@ -42,7 +40,6 @@ namespace BoredWithFriends.Network
 		{
 			playerConnections.Remove(con.Player);
 			playerGames.Remove(con.Player);
-			spectatorGames.Remove(con.Player);
 		}
 
 		public static void AddPlayerConnection(PlayerConnection con)
