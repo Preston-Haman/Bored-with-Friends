@@ -89,6 +89,12 @@ namespace BoredWithFriends.Network
 		{
 			Player = player;
 		}
+
+		public override void Close()
+		{
+			base.Close();
+			Server.PlayerDisconnected(this);
+		}
 	}
 
 	/// <summary>
@@ -135,7 +141,7 @@ namespace BoredWithFriends.Network
 		/// <summary>
 		/// Creates a new <see cref="LocalConnection"/> for the given <paramref name="player"/>.
 		/// </summary>
-		/// <param name="player">The player this comnection is for.</param>
+		/// <param name="player">The player this connection is for.</param>
 		public LocalConnection(Player player) : base(null!, player)
 		{
 			//Nothing to do.
@@ -195,6 +201,12 @@ namespace BoredWithFriends.Network
 		protected ConnectionState connectionState = ConnectionState.Unknown;
 
 		/// <summary>
+		/// Tracks if <see cref="client"/> has had its resources closed and disposed of.<br></br>
+		/// This is set to true by a call to <see cref="Close"/>.
+		/// </summary>
+		private bool disposed = false;
+
+		/// <summary>
 		/// Creates a <see cref="Connection"/> with the given <see cref="TcpClient"/>.
 		/// </summary>
 		/// <param name="client">A <see cref="TcpClient"/> for this <see cref="Connection"/></param>
@@ -236,10 +248,11 @@ namespace BoredWithFriends.Network
 		/// <summary>
 		/// Closes and disposes of <see cref="client"/>.
 		/// </summary>
-		public void Close()
+		public virtual void Close()
 		{
 			client.Close();
 			client.Dispose();
+			disposed = true;
 		}
 
 		/// <summary>
@@ -248,6 +261,10 @@ namespace BoredWithFriends.Network
 		/// <returns>True if this connection is active, false otherwise.</returns>
 		public virtual bool IsOpen()
 		{
+			if (!client.Connected && !disposed)
+			{
+				Close();
+			}
 			return client.Connected;
 		}
 
