@@ -6,6 +6,34 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network
 {
+	/// <summary>
+	/// A simple extension class that adds convenience methods to numeric types that allow
+	/// retrieval of bytes by their index for multi-byte numeric value types.
+	/// </summary>
+	internal static class NumberExtension
+	{
+		public static byte GetByteAtPosition(this short value, int position)
+		{
+			return (byte) ((value >> position * 8) & 0xFF);
+		}
+
+		public static byte GetByteAtPosition(this int value, int position)
+		{
+			return (byte) ((value >> position * 8) & 0xFF);
+		}
+
+		public static byte GetByteAtPosition(this long value, int position)
+		{
+			return (byte) ((value >> position * 8) & ((long) 0xFF));
+		}
+	}
+
+	/// <summary>
+	/// A simple buffer class that reads and writes in Little Endian byte order.
+	/// This class is backed by an array that grows to accommodate the data written to it.
+	/// The default initial size of the array is 1024 bytes, and it will grow in increments of
+	/// 1024 bytes to support more data when necessary.
+	/// </summary>
 	internal class ByteArrayStream
 	{
 		private byte[] buffer;
@@ -209,7 +237,7 @@ namespace BoredWithFriends.Network
 		{
 			if (value.Length > short.MaxValue)
 			{
-				throw new ArgumentException("This connection protocol does not support strings longer than that the max value of a signed 16-bit integer.");
+				throw new ArgumentException("This stream does not support writing strings longer than the max value of a signed 16-bit integer.");
 			}
 
 			WriteShort((short) value.Length);
