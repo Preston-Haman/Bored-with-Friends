@@ -108,7 +108,7 @@ namespace BoredWithFriends.Network
 		/// <param name="packet">The packet to send.</param>
 		private static void SendLocalPacket(BasePacket packet)
 		{
-			NetHandler.SendPacket(Server.GetLocalConnection(Server.LocalGameState!.getCurrentPlayer()), packet);
+			NetHandler.SendPacket(Server.GetLocalConnection(Server.LocalGameState!.GetCurrentPlayer()), packet);
 		}
 	}
 }

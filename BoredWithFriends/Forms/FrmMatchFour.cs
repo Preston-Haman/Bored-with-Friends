@@ -42,7 +42,7 @@ namespace BoredWithFriends.Forms
 			MatchFourGameState gameState = ctrlMatchFourBoard.GameState;
 			
 			//TODO: Warn the player that this will forfeit the match if it's not over, yet.
-			gameState.PlayerForfeit(activePlayer is null ? gameState.GetCurrentPlayer() : activePlayer);
+			gameState.PlayerForfeit(activePlayer is null ? gameState.GetCurrentPlayer().PlayerID : activePlayer.PlayerID);
 
 			//TODO: When online play is supported, we will have to call this from the server
 			//side of things and tell the clients to reset vs the user triggering it like this.
