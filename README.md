@@ -9,11 +9,12 @@ vertically, horizantally, or diagonally wins. You can play hot seat with your fr
 - Local and/or Online Score Board
 
 ## Getting Started w/ Visual Studio
-- Download [VS2022](https://visualstudio.microsoft.com/vs/) with the ==.NET Entity Framework 6 Workload==
+- Download [VS2022](https://visualstudio.microsoft.com/vs/) with the **.NET Entity Framework 6 Workload**
 - Clone the repo and build the project.
-- Run ==Update-Database== in the Package Manager Console
+- Run **Update-Database** in the Package Manager Console to run the script to create the database
 
 ## Helpful Tutorials
-- [Getting Started with Entity Framework 6](https://www.entityframeworktutorial.net/entityframework6/introduction.aspx)
 
-## Screen Shots (coming soon)
+
+## Screen Shots
+![The main menu](Screenshots/InitialMenu.png) ![A Match Four game](Screenshots/MatchFourGame.png)
