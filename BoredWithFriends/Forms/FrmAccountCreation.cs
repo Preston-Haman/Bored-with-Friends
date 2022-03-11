@@ -53,10 +53,8 @@ namespace BoredWithFriends.Forms
 			//clear warnings to adjust to warnings to needed input adjustments
 			ClearWarnings();
 
-			PlayerLogin user = DatabaseContext.GetPlayerLogin("userName");
-
 			bool nameBlank = string.IsNullOrEmpty(userName);
-			bool nameExists = user != null;
+			bool nameExists = DatabaseContext.NameExists(userName);
 			bool passwordBlank = string.IsNullOrEmpty(password);
 			bool passwordsMatch = password.Equals(confirmPassword);
 
