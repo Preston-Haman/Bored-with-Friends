@@ -7,6 +7,30 @@ using System.Threading.Tasks;
 namespace BoredWithFriends.Games
 {
 	/// <summary>
+	/// An interface of callback methods intended for the GUI consumer of a <see cref="MatchFourGameState"/>.
+	/// </summary>
+	internal interface IMatchFourGui
+	{
+		/// <summary>
+		/// Called when the board of a Match Four game has undergone a change. Implementors
+		/// may use this method to display the new state of the board on the GUI.
+		/// </summary>
+		/// <param name="game">The game in which the board state has changed.</param>
+		public void UpdateBoardDisplay(MatchFourGameState game);
+	}
+
+	/// <summary>
+	/// An empty implementation of <see cref="IMatchFourGui"/> that does nothing.
+	/// </summary>
+	internal class NoGuiMatchFour : IMatchFourGui
+	{
+		public void UpdateBoardDisplay(MatchFourGameState game)
+		{
+			//Do nothing.
+		}
+	}
+
+	/// <summary>
 	/// A GameState that represents Match Four (more commonly known as Connect Four). In
 	/// a standard game, there are six rows and seven columns on the board. This implementation
 	/// allows the client to specify a larger custom board size, but not a smaller one.
@@ -40,15 +64,24 @@ namespace BoredWithFriends.Games
 		private const int MAX_NUMBER_OF_PLAYERS = 2;
 
 		/// <summary>
+		/// /// <summary>
+		/// Users of this gamestate must provide an implementation of this interface so changes
+		/// to the gamestate can be reflected upon the GUI.
+		/// </summary>
+		private readonly IMatchFourGui gameGui;
+
+		/// <summary>
 		/// A player competing in this match.
 		/// </summary>
 		private readonly TurnBasedPlayer player1, player2;
 
 		/// <summary>
-		/// Represents the board as a 2D array. It's important to note that
-		/// this is rows, and then columns. In terms of coordinates, that's
-		/// y, and then x. To help match screen coordinates when we display
-		/// this information later, the first row is the top row of the board.
+		/// Represents the board as a 2D array.
+		/// <br></br><br></br>
+		/// It's important to note that this is rows, and then columns.
+		/// In terms of coordinates, that's y, and then x. To help match screen
+		/// coordinates when we display this information later, the first row is
+		/// the top row of the board.
 		/// </summary>
 		private readonly BoardToken[,] board;
 
@@ -71,55 +104,135 @@ namespace BoredWithFriends.Games
 		/// Creates a new game of Match Four with the given number of rows and columns. The given
 		/// players will be the competing players for this game.
 		/// <br></br><br></br>
-		/// To allow the player of this game a fair chance of competition, the number of rows and
+		/// To allow the players of this game a fair chance of competition, the number of rows and
 		/// columns may not be less than that of a standard game.
 		/// </summary>
 		/// <param name="rows">The number of board rows to use for this game.</param>
 		/// <param name="columns">The number of board columns to use for this game.</param>
 		/// <param name="player1">The player that will be using Blue tokens.</param>
 		/// <param name="player2">The player that will be using Red tokens.</param>
-		public MatchFourGameState(int rows, int columns, Player player1 = null!, Player player2 = null!)
+		/// <param name="generalGameGui">See <see cref="GameState.generalGameGui"/>.</param>
+		/// <param name="gameGui">See <see cref="gameGui"/>.</param>
+		public MatchFourGameState(int rows, int columns, Player player1 = null!, Player player2 = null!, IGeneralGameGui generalGameGui = null!, IMatchFourGui gameGui = null!) :
+			base(generalGameGui is not null ? generalGameGui : new NoGuiGame())
 		{
+			this.gameGui = gameGui is not null ? gameGui : new NoGuiMatchFour();
+
 			Rows = rows < 6 ? 6 : rows;
 			Columns = columns < 7 ? 7 : columns;
 
+			this.player1 = player1 is null ? new TurnBasedPlayer("Guest1") : new TurnBasedPlayer(player1);
+			this.player2 = player2 is null ? new TurnBasedPlayer("Guest2") : new TurnBasedPlayer(player2);
+			
+			this.player1.IsPlayerTurn = true;
+			
+			AddCompetingPlayers(this.player1, this.player2);
+
 			board = new BoardToken[rows, columns];
-			for (int y = 0; y < rows; y++)
+			ResetBoard(); //I'm not actually sure if this is necessary.
+
+			GameHasStarted = true;
+		}
+
+		/// <summary>
+		/// Iterates through <see cref="board"/> and sets every value to <see cref="BoardToken.Empty"/>.
+		/// </summary>
+		private void ResetBoard()
+		{
+			//TODO: If a newly constructed board defaults to the Empty value, just make a new one instead.
+			for (int y = 0; y < Rows; y++)
 			{
-				for (int x = 0; x < columns; x++)
+				for (int x = 0; x < Columns; x++)
 				{
 					board[y, x] = BoardToken.Empty;
 				}
 			}
+			tokenPlayCount = 0;
+			gameGui.UpdateBoardDisplay(this);
+		}
 
-			if (player1 is null)
+		public void SetBoardState(int playerTurnID, BoardToken[,] newBoard)
+		{
+			if (newBoard.GetLength(0) != board.GetLength(0) || newBoard.GetLength(0) != board.GetLength(0))
 			{
-				this.player1 = new TurnBasedPlayer("Guest1");
-			}
-			else
-			{
-				this.player1 = new TurnBasedPlayer(player1);
-			}
-
-			if (player2 is null)
-			{
-				this.player2 = new TurnBasedPlayer("Guest2");
-			}
-			else
-			{
-				this.player2 = new TurnBasedPlayer(player2);
+				throw new ArgumentException("The new board state must be of the same size as the current one.");
 			}
 
-			AddCompetingPlayers(this.player1, this.player2);
+			tokenPlayCount = 0;
+			for (int y = 0; y < Rows; y++)
+			{
+				for (int x = 0; x < Columns; x++)
+				{
+					board[y, x] = newBoard[y, x];
+					if (board[y, x] != BoardToken.Empty)
+					{
+						tokenPlayCount++;
+					}
+				}
+			}
+			gameGui.UpdateBoardDisplay(this);
+			SetPlayerTurn(GetPlayerByID(playerTurnID, out _));
+		}
 
-			this.player1.IsPlayerTurn = true;
-			GameHasStarted = true;
+		/// <summary>
+		/// Sets the given <paramref name="player"/> as the active player and calls the appropriate
+		/// callback.
+		/// </summary>
+		/// <param name="player">The player to provide a turn to.</param>
+		private void SetPlayerTurn(Player player)
+		{
+			bool isPlayer1Turn = player == player1;
+			player1.IsPlayerTurn = isPlayer1Turn;
+			player2.IsPlayerTurn = !isPlayer1Turn;
+			generalGameGui.UpdateActivePlayer(this, isPlayer1Turn ? player1 : player2);
+		}
+
+		/// <summary>
+		/// Checks if playing in the given <paramref name="column"/> is possible and returns true if so.
+		/// This method outputs the row that would be played if a token was played in the given <paramref name="column"/>.
+		/// </summary>
+		/// <param name="player">The player making the play.</param>
+		/// <param name="column">The column to play in.</param>
+		/// <param name="playedRow">The row that would be played if the play was made.</param>
+		/// <returns>True if the play is possible.</returns>
+		public bool CheckPlayIsPossible(TurnBasedPlayer player, int column, out int playedRow)
+		{
+			playedRow = -1;
+			if (player != player1 || player != player2)
+			{
+				System.Diagnostics.Debug.WriteLine("A spectator of Match Four attempted to make a play!");
+				return false;
+			}
+
+			if (!player.IsPlayerTurn | !GameHasStarted | GameHasEnded)
+			{
+				return false;
+			}
+
+			bool tokenPlayable = false;
+			playedRow = Rows - 1;
+			for (; playedRow >= 0; playedRow--)
+			{
+				if (board[playedRow, column] == BoardToken.Empty)
+				{
+					tokenPlayable = true;
+					break;
+				}
+			}
+
+			if (!tokenPlayable)
+			{
+				playedRow = -1;
+			}
+
+			return tokenPlayable;
 		}
 
 		/// <summary>
 		/// Plays a token representing the given player onto the board into the given column.
 		/// Returns true when the player's turn was successful, false if the player cannot make
-		/// the given move.
+		/// the given move. If the move cannot be made, <paramref name="playedRow"/> will be set
+		/// to -1; if it can, then it will be set to the row of the play.
 		/// <br></br><br></br>
 		/// By playing a token, the game may come to an end. Check <see cref="GameState.GameHasEnded"/> to see
 		/// if this move resulted in ending the game. The game can end here for two reasons; either the player
@@ -127,42 +240,29 @@ namespace BoredWithFriends.Games
 		/// </summary>
 		/// <param name="player">The player making this game move.</param>
 		/// <param name="playedColumn">The column to play a token in.</param>
-		/// <returns></returns>
-		public bool PlayGamePiece(TurnBasedPlayer player, int playedColumn)
+		/// <param name="playedRow">The row the game piece was played in, or -1 if the play failed.</param>
+		/// <returns>True if the play was successful, false otherwise.</returns>
+		public bool PlayGamePiece(TurnBasedPlayer player, int playedColumn, out int playedRow)
 		{
-			if (player.IsPlayerTurn & GameHasStarted & !GameHasEnded)
+			if (CheckPlayIsPossible(player, playedColumn, out playedRow))
 			{
-				TurnBasedPlayer opponent = player == player1 ? player2 : player1;
-				BoardToken playerToken = player == player1 ? BoardToken.Blue : BoardToken.Red;
-
-				bool tokenPlayed = false;
-				int playedRow = Rows - 1;
-				for (; playedRow >= 0; playedRow--)
-				{
-					if (board[playedRow, playedColumn] == BoardToken.Empty)
-					{
-						board[playedRow, playedColumn] = playerToken;
-						tokenPlayed = true;
-						break;
-					}
-				}
-
-				if (!tokenPlayed)
-				{
-					return false;
-				}
-
+				BoardToken playerToken = board[playedRow, playedColumn] = player == player1 ? BoardToken.Blue : BoardToken.Red;
 				tokenPlayCount++;
+
 				CheckWinCondition(player, playerToken, playedColumn, playedRow);
+				
+				//Give a turn to the opponent player
+				SetPlayerTurn(player == player1 ? player2 : player1);
+
+				gameGui.UpdateBoardDisplay(this);
 				if (tokenPlayCount == Rows * Columns)
 				{
 					//Game is over because board is full!
 					GameHasEnded = true;
 				}
-				player.IsPlayerTurn = false;
-				opponent.IsPlayerTurn = true;
 				return true;
 			}
+
 			return false;
 		}
 
@@ -288,6 +388,15 @@ namespace BoredWithFriends.Games
 		}
 
 		/// <summary>
+		/// Returns the number of tokens that have been played during this match.
+		/// </summary>
+		/// <returns>The <see cref="tokenPlayCount"/>.</returns>
+		public int GetTurnCount()
+		{
+			return tokenPlayCount;
+		}
+
+		/// <summary>
 		/// Retrieves the token at the specified row and column of the game board.
 		/// </summary>
 		/// <param name="row">The board row of interest.</param>
@@ -296,6 +405,48 @@ namespace BoredWithFriends.Games
 		public BoardToken GetTokenAt(int row, int column)
 		{
 			return board[row, column];
+		}
+
+		/// <inheritdoc/>
+		public override TurnBasedPlayer GetPlayerByID(int playerID, out bool isSpectator)
+		{
+			Player player = base.GetPlayerByID(playerID, out isSpectator);
+			if (!isSpectator && player is TurnBasedPlayer turnPlayer)
+			{
+				return turnPlayer;
+			}
+
+			return new(player);
+		}
+
+		/// <summary>
+		/// Removes the given <paramref name="player"/> from the game. If the player
+		/// is competing in this game, they will forfeit the match if <see cref="tokenPlayCount"/>
+		/// is greater than one.
+		/// </summary>
+		/// <param name="player"></param>
+		/// <param name="spectator"></param>
+		public override void PlayerLeaves(Player player, bool spectator = false)
+		{
+			if (!spectator && tokenPlayCount > 1)
+			{
+				PlayerForfeit(player);
+			}
+			base.PlayerLeaves(player, spectator);
+		}
+
+		/// <inheritdoc/>
+		public override void ResetGame()
+		{
+			lock (this)
+			{
+				GameHasEnded = false;
+				Winners.Clear();
+				Losers.Clear();
+
+				ResetBoard();
+				SetPlayerTurn(player1);
+			}
 		}
 
 		/// <inheritdoc/>
