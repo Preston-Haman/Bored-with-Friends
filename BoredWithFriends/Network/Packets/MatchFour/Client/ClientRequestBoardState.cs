@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BoredWithFriends.Games;
+using BoredWithFriends.Network.Packets.MatchFour.Server;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,8 +21,9 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Client
 
 		protected override void RunImpl(Connection con)
 		{
-			//TODO: Reply with SendBoardState
-			throw new NotImplementedException();
+			GetPlayerConnectionAndGameState<MatchFourGameState>(con, out PlayerConnection pcon, out MatchFourGameState game);
+
+			PacketSendUtility.SendPacket(pcon.Player, new ServerSendBoardState(game));
 		}
 
 		protected override void WriteImpl()

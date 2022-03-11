@@ -31,11 +31,14 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Server
 
 		protected override void RunImpl()
 		{
-			/*TODO:
-			 * Clear the board in the GameState (make a new game).
-			 * Announce that the specified player forfeited the game.
-			 */
-			throw new NotImplementedException();
+			GetClientGameState<MatchFourGameState>(out MatchFourGameState game);
+			
+			if (playerForfeited)
+			{
+				game.PlayerForfeit(playerID);
+			}
+
+			game.ResetGame();
 		}
 
 		protected override void WriteImpl()
