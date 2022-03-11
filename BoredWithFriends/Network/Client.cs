@@ -76,5 +76,13 @@ namespace BoredWithFriends.Network
 
 			clientNetworkHandler.ConnectToServer(serverIP, port);
 		}
+
+		public static void StopClient()
+		{
+			if (clientNetworkHandler is not null)
+			{
+				clientNetworkHandler.Stop();
+			}
+		}
 	}
 }
