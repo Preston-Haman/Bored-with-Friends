@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BoredWithFriends.Games;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -131,6 +132,32 @@ namespace BoredWithFriends.Network.Packets
 		{
 			//Do nothing.
 		}
+
+		/// <summary>
+		/// Server-side convenience method.
+		/// <br></br><br></br>
+		/// Outputs <paramref name="pcon"/> and <paramref name="game"/> if <paramref name="con"/> is a
+		/// <see cref="PlayerConnection"/> playing a game of type <typeparamref name="Game"/>.
+		/// </summary>
+		/// <typeparam name="Game">A <see cref="GameState"/> class that player is expected to be playing.</typeparam>
+		/// <param name="con">The connection this packet was received on.</param>
+		/// <param name="pcon">The given <paramref name="con"/> cast as a <see cref="PlayerConnection"/>.</param>
+		/// <param name="game">The <see cref="GameState"/> of type <typeparamref name="Game"/> that
+		/// <paramref name="pcon"/> is playing.</param>
+		/// <exception cref="InvalidOperationException">If <paramref name="con"/> is not a <see cref="PlayerConnection"/>
+		/// or if </exception>
+		protected void GetPlayerConnectionAndGameState<Game>(Connection con, out PlayerConnection pcon, out Game game)
+			where Game : GameState
+		{
+			if (con is not PlayerConnection playerConnection || Server.GetGameState(playerConnection.Player) is not Game gamestate)
+			{
+				throw new InvalidOperationException($"Cannot execute {this.GetType().Name} packet " +
+					$"while the connection is not of type {nameof(PlayerConnection)} " +
+					$"or the registered {nameof(GameState)} is not of type {typeof(Game).Name}.");
+			}
+			pcon = playerConnection;
+			game = gamestate;
+		}
 	}
 
 	/// <summary>
@@ -138,7 +165,27 @@ namespace BoredWithFriends.Network.Packets
 	/// </summary>
 	internal abstract class ServerPacket : BasePacket
 	{
-		//Eventually this might have some server packet specific aspects
+		/// <summary>
+		/// Client-side convenience method.
+		/// <br></br><br></br>
+		/// Outputs <paramref name="game"/> if the <see cref="Client.LocalGameState"/> is of type <typeparamref name="Game"/>.
+		/// </summary>
+		/// <typeparam name="Game">A <see cref="GameState"/> class that player is expected to be playing.</typeparam>
+		/// <param name="game">The <see cref="GameState"/> of type <typeparamref name="Game"/> that
+		/// the player is playing.</param>
+		/// <exception cref="InvalidOperationException">If the <see cref="Client.LocalGameState"/> is not
+		/// of type <typeparamref name="Game"/></exception>
+		protected void GetClientGameState<Game>(out Game game)
+			where Game : GameState
+		{
+			if (Client.LocalGameState is not Game localGame)
+			{
+				throw new InvalidOperationException($"Cannot execute {this.GetType().Name} packet " +
+					$"while the client is not playing in a {typeof(Game).Name}.");
+			}
+
+			game = localGame;
+		}
 	}
 
 	/// <summary>
