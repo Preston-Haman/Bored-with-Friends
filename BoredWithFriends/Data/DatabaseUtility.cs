@@ -1,4 +1,5 @@
-﻿using BoredWithFriends.Models;
+﻿using BoredWithFriends.Games;
+using BoredWithFriends.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,13 +41,16 @@ namespace BoredWithFriends.Data
 		{
 			DatabaseContext database = new();
 
-			PlayerLogin? user = (from logins in database.PlayerLogins
+			PlayerLogin? userLogin = (from logins in database.PlayerLogins
 								 where logins.UserName == userName
 								 select logins).SingleOrDefault();
 
-			if (user != null)
+			if (userLogin != null)
 			{
-				return user;
+				Player user = new(userLogin.PlayerID, userLogin.UserName);
+
+				UpdateLastPlayTime(user);
+				return userLogin;
 			}
 			else
 			{
@@ -57,10 +61,10 @@ namespace BoredWithFriends.Data
 		/// <summary>
 		/// Searches for a specific user in the PlayerStatistics table
 		/// </summary>
-		/// <param name="userName">The userName to search for</param>
+		/// <param name="user">The user to search for</param>
 		/// <returns>The PlayerStatistics Object related to the userName from PlayerLogin table</returns>
 		/// <exception cref="ArgumentNullException">If a PlayerStatistics PlayerID is not found in the table</exception>
-		public static PlayerStatistics GetPlayerStatistics(PlayerLogin user)
+		public static PlayerStatistics GetPlayerStatistics(Player user)
 		{
 			DatabaseContext database = new();
 
@@ -72,7 +76,29 @@ namespace BoredWithFriends.Data
 			}
 			else
 			{
-				throw new ArgumentNullException($"No PlayerStatistics PlayerID under {user.UserName}");
+				throw new ArgumentNullException($"No PlayerStatistics PlayerID under {user.Name}");
+			}
+		}
+
+		/// <summary>
+		/// Searches for a specific user in the PlayerStatistics table
+		/// </summary>
+		/// <param name="userLogin">The userName to search for</param>
+		/// <returns>The PlayerStatistics Object related to the userName from PlayerLogin table</returns>
+		/// <exception cref="ArgumentNullException">If a PlayerStatistics PlayerID is not found in the table</exception>
+		public static PlayerStatistics GetPlayerStatistics(PlayerLogin userLogin)
+		{
+			DatabaseContext database = new();
+
+			PlayerStatistics? userStats = database.PlayerStatistics.Find(userLogin.PlayerID);
+
+			if (userStats != null)
+			{
+				return userStats;
+			}
+			else
+			{
+				throw new ArgumentNullException($"No PlayerStatistics PlayerID under {userLogin.UserName}");
 			}
 		}
 
@@ -96,15 +122,14 @@ namespace BoredWithFriends.Data
 			return true;
 		}
 
-
 		/// <summary>
 		/// Updates a user's password by using their PlayerLogin and given string
 		/// </summary>
 		/// <param name="user">The user to change passwords</param>
-		/// <param name="password">The password to change to</param>
-		public static void UpdatePassword(PlayerLogin user, string password)
+		/// <param name="newPassword">The password to change to</param>
+		public static void UpdatePassword(PlayerLogin user, string newPassword)
 		{
-			user.Password = password;
+			user.Password = newPassword;
 
 			DatabaseContext database = new();
 			database.Update(user);
@@ -125,11 +150,12 @@ namespace BoredWithFriends.Data
 			database.Remove(userStatistics);
 			database.SaveChangesAsync();
 		}
+
 		/// <summary>
 		/// Adds a win when a player wins a game
 		/// </summary>
 		/// <param name="user">User to add a win to</param>
-		public static void AddWin(PlayerLogin user)
+		public static void AddWin(Player user)
 		{
 			PlayerStatistics userStats = GetPlayerStatistics(user);
 			userStats.Wins++;
@@ -143,7 +169,7 @@ namespace BoredWithFriends.Data
 		/// Adds a loss when a player loses a game 
 		/// </summary>
 		/// <param name="user">User to give one loss to</param>
-		public static void AddLoss(PlayerLogin user)
+		public static void AddLoss(Player user)
 		{			
 			PlayerStatistics userStats = GetPlayerStatistics(user);
 			userStats.Losses++;
@@ -156,21 +182,31 @@ namespace BoredWithFriends.Data
 		}
 
 		/// <summary>
-		/// Adds up total time logged in during a session to reflect
-		/// how long a user has been logged in since creation.
+		/// Adds up total time logged in during a session in milisceonds
+		/// to reflect how long a user has been logged in since creation.
 		/// </summary>
 		/// <exception cref="NotImplementedException"></exception>
-		public static void AddPlayTime()
+		public static void AddPlayTime(Player user)
 		{
-			//TODO: might be easier to add when we implement the login function
-			throw new NotImplementedException();
+			PlayerStatistics userStats = GetPlayerStatistics(user);
+			PlayerLogin userLogin = GetPlayerLogin(user.Name);
+
+			TimeSpan currentSessionTime = DateTime.Now.Subtract(userLogin.LastLoginTime);
+			long timeInMiliseconds = (long)currentSessionTime.TotalMilliseconds;
+
+			userStats.TotalPlayTime += timeInMiliseconds;
+
+			DatabaseContext database = new();
+			database.Update(userStats);
+			database.SaveChangesAsync();
+
 		}
 
 		/// <summary>
 		/// Changes LastPlayTime to reflect the last time the user logged in
 		/// </summary>
 		/// <param name="user">user to change LastPlayTime</param>
-		public static void UpdateLastPlayTime(PlayerLogin user)
+		public static void UpdateLastPlayTime(Player user)
 		{
 			PlayerStatistics userStats = GetPlayerStatistics(user);
 			userStats.LastPlayedTime = DateTime.Now;
