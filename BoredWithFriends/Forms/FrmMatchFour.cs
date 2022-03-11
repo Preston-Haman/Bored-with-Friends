@@ -1,4 +1,6 @@
 ﻿using BoredWithFriends.Games;
+using BoredWithFriends.Network;
+using BoredWithFriends.Network.Packets.MatchFour.Client;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,48 +15,30 @@ namespace BoredWithFriends.Forms
 {
 	internal partial class FrmMatchFour : Form
 	{
-		private readonly TurnBasedPlayer? activePlayer;
-
+		/// <summary>
+		/// Creates a playable Match Four GUI.
+		/// </summary>
 		public FrmMatchFour()
 		{
 			//For testing purposes.
 			InitializeComponent();
 			this.ApplyGeneralTheme();
-			ctrlMatchFourBoard.NewGame(new MatchFourGameState(6, 7));
-			activePlayer = null;
 		}
 
-		/// <summary>
-		/// Creates a playable Match Four GUI for one player. When using local play,
-		/// a separate instance must be used to track other players.
-		/// </summary>
-		/// <param name="activePlayer"></param>
-		public FrmMatchFour(TurnBasedPlayer activePlayer, MatchFourGameState gameState)
+		public IMatchFourGui GetMatchFourGuiCallback()
 		{
-			InitializeComponent();
-			this.ApplyGeneralTheme();
-			this.activePlayer = activePlayer;
-			ctrlMatchFourBoard.NewGame(gameState);
+			return ctrlMatchFourBoard;
 		}
 
 		private void btnClearBoard_Click(object sender, EventArgs e)
 		{
-			MatchFourGameState gameState = ctrlMatchFourBoard.GameState;
-			
-			//TODO: Warn the player that this will forfeit the match if it's not over, yet.
-			gameState.PlayerForfeit(activePlayer is null ? gameState.GetCurrentPlayer().PlayerID : activePlayer.PlayerID);
+			string confirmMessage = "This will forfeit the game if it's in progress; are you sure?";
+			DialogResult result = MessageBox.Show(this, confirmMessage, "Confirm Clear Board", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
 
-			//TODO: When online play is supported, we will have to call this from the server
-			//side of things and tell the clients to reset vs the user triggering it like this.
-
-			List<Player> players = gameState.Players;
-			List<Player> spectators = gameState.Spectators;
-
-			gameState = new MatchFourGameState(gameState.Rows, gameState.Columns, players[0], players[1]);
-			gameState.AddSpectatingPlayers(spectators.ToArray());
-
-			ctrlMatchFourBoard.NewGame(gameState);
-			Refresh();
+			if (result == DialogResult.Yes)
+			{
+				PacketSendUtility.SendPacket(new ClientClearBoard());
+			}
 		}
 
 		/// <summary>
@@ -69,24 +53,15 @@ namespace BoredWithFriends.Forms
 			{
 				int columnIndex = int.Parse(strTag);
 
-				MatchFourGameState gameState = ctrlMatchFourBoard.GameState;
-
-				if (gameState.PlayGamePiece(activePlayer is null ? gameState.GetCurrentPlayer() : activePlayer, columnIndex))
+				try
 				{
-					Refresh();
+					PacketSendUtility.SendPacket(new ClientPlayToken(columnIndex));
 				}
-
-				if (gameState.GameHasEnded)
+				catch (FailedPlayException)
 				{
-					//TODO: Disable column buttons, declare game end, declare winner (if there was one).
-					if (gameState.GameHasWinner)
-					{
-						//Declare winner
-					}
-					else
-					{
-						//Declare cat's game
-					}
+					//Wasn't our turn or that column was filled.
+					//We can do the following, but it could be spammy if the player keeps clicking when it's not their turn...
+					//PacketSendUtility.SendPacket(new ClientRequestBoardState());
 				}
 			}
 		}

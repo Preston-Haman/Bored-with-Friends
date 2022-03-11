@@ -11,30 +11,29 @@ using System.Windows.Forms;
 
 namespace BoredWithFriends.Controls
 {
-	internal partial class CtrlMatchFourBoard : UserControl
+	internal partial class CtrlMatchFourBoard : UserControl, IMatchFourGui
 	{
 		/// <summary>
 		/// The amount of pixels to use as padding around the holes of the gameboard.
 		/// </summary>
 		public readonly int inset;
 
-		public MatchFourGameState GameState { get; private set; }
+		private MatchFourGameState gameState = null!;
 
-		public CtrlMatchFourBoard() : this(new MatchFourGameState(6, 7))
+		public CtrlMatchFourBoard() : this(3)
 		{
 			//Nothing to do; this is for the designer mostly.
 		}
 
-		public CtrlMatchFourBoard(MatchFourGameState gameState, int inset = 3)
+		public CtrlMatchFourBoard(int inset = 3)
 		{
 			InitializeComponent();
 			this.inset = inset;
-			GameState = gameState;
 		}
 
-		public void NewGame(MatchFourGameState gameState)
+		public void UpdateBoardDisplay(MatchFourGameState game)
 		{
-			GameState = gameState;
+			gameState = game;
 			Refresh();
 		}
 
@@ -44,18 +43,21 @@ namespace BoredWithFriends.Controls
 			int width = Size.Width;
 			int height = Size.Height;
 
-			//Split size into 7x6 sections
-			int sectionWidth = (width / GameState.Columns);
-			int sectionHeight = (height / GameState.Rows);
+			int columns = gameState is null ? 7 : gameState.Columns;
+			int rows = gameState is null ? 6 : gameState.Rows;
 
-			//Accomodate inset
+			//Split size into 7x6 sections
+			int sectionWidth = (width / columns);
+			int sectionHeight = (height / rows);
+
+			//Accommodate inset
 			int circleWidth = sectionWidth - (inset * 2);
 			int circleHeight = sectionHeight - (inset * 2);
 
 			//Get the excess pixels from the above division, and prepare to use it as a padding offset.
 			//x and y here will be the top left origin for each section.
-			int x = (width % GameState.Columns) / 2;
-			int y = (height % GameState.Rows) / 2;
+			int x = (width % columns) / 2;
+			int y = (height % rows) / 2;
 
 			//Setup colours
 			SolidBrush emptyBrush = new(ParentForm.BackColor);
@@ -66,12 +68,12 @@ namespace BoredWithFriends.Controls
 			//Get the graphics context
 			Graphics g = e.Graphics;
 
-			for (int i = 0; i < GameState.Rows; i++)
+			for (int i = 0; i < rows; i++)
 			{
-				for (int j = 0; j < GameState.Columns; j++)
+				for (int j = 0; j < columns; j++)
 				{
 					//Fill sections with circles of blue, red, or empty colour based on GameState
-					switch (GameState.GetTokenAt(i, j))
+					switch (gameState is null ? MatchFourGameState.BoardToken.Empty : gameState.GetTokenAt(i, j))
 					{
 						case MatchFourGameState.BoardToken.Empty:
 							g.FillEllipse(emptyBrush, x + (j * sectionWidth) + inset, y + (i * sectionHeight) + inset, circleWidth, circleHeight);
