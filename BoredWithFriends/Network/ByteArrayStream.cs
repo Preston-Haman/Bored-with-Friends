@@ -277,13 +277,7 @@ namespace BoredWithFriends.Network
 			short length = ReadShort();
 			Read(length, out byte[] bytes);
 
-			StringBuilder str = new(length);
-			for (int i = 0; i < bytes.Length; i++)
-			{
-				str.Append((char) bytes[i]);
-			}
-
-			return str.ToString();
+			return Encoding.Unicode.GetString(bytes);
 		}
 
 		/// <summary>
@@ -418,16 +412,15 @@ namespace BoredWithFriends.Network
 		/// <param name="value">The value to write to this stream.</param>
 		public void WriteString(string value)
 		{
-			if (value.Length > short.MaxValue)
+			byte[] stringBytes = Encoding.Unicode.GetBytes(value);
+
+			if (stringBytes.Length > short.MaxValue)
 			{
 				throw new ArgumentException("This stream does not support writing strings longer than the max value of a signed 16-bit integer.");
 			}
 
-			WriteShort((short) value.Length);
-			foreach (char c in value)
-			{
-				WriteChar(c);
-			}
+			WriteShort((short) stringBytes.Length);
+			Write(stringBytes);
 		}
 	}
 }
