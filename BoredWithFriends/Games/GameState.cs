@@ -7,85 +7,8 @@ using System.Threading.Tasks;
 namespace BoredWithFriends.Games
 {
 	/// <summary>
-	/// The most basic representation of a Player. This class holds a reference to the player's
-	/// username and their ID -- both from the database (except when the player is a guest).
-	/// </summary>
-	internal class Player
-	{
-		/// <summary>
-		/// The player's PlayerID from the database; if this is set to -1,
-		/// then this player is a guest (not stored in the database).
-		/// </summary>
-		public int PlayerID { get; } = -1;
-
-		/// <summary>
-		/// The username of the player in the database. This name is unique to this player
-		/// so long as they are not a guest. When set as a guest, the player's name should
-		/// still be unique; but it will not be enforced by the database.
-		/// </summary>
-		public string Name { get; protected set; }
-
-		/// <summary>
-		/// Creates a simple Player with the specified PlayerID and username. These values
-		/// should come from the database. If the player is a guest, then the PlayerID should
-		/// be set as -1.
-		/// </summary>
-		/// <param name="playerID">The PlayerID from the database, or -1 for a guest.</param>
-		/// <param name="name">The username of the player; this may display on screen.</param>
-		public Player(int playerID, string name)
-		{
-			PlayerID = playerID;
-			Name = name;
-		}
-
-		/// <summary>
-		/// Returns this player's username for display.
-		/// </summary>
-		/// <returns>The player's username for display.</returns>
-		public override string ToString()
-		{
-			return Name;
-		}
-
-		/// <summary>
-		/// If this player is a guest, then this method returns the hash of this Player's name.
-		/// If this player is not a guest, then this method returns the <see cref="PlayerID"/>
-		/// of this player.
-		/// </summary>
-		/// <returns></returns>
-		public override int GetHashCode()
-		{
-			return PlayerID == -1 ? Name.GetHashCode() : PlayerID;
-		}
-	}
-
-	/// <summary>
-	/// A simple Player class that maintains a boolean value for tracking the player's turn.
-	/// </summary>
-	internal class TurnBasedPlayer : Player
-	{
-		/// <summary>
-		/// For turn based games, this will be true when the player may perform an action;
-		/// otherwise, it will be false. A false value indicates that the player should not
-		/// be allowed to perform input on the current game state.
-		/// </summary>
-		public bool IsPlayerTurn { get; set; }
-
-		/// <inheritdoc/>
-		public TurnBasedPlayer(int playerID, string name) : base(playerID, name)
-		{
-			//Nothing else to do for now.
-		}
-
-		public TurnBasedPlayer(Player player) : base(player.PlayerID, player.Name)
-		{
-			//Nothing else to do for now.
-		}
-	}
-
-	/// <summary>
 	/// GameStates represent an entire Game that can be played by Players. Each game is
-	/// different, so this absract class merely outlines things that are common to most games.
+	/// different, so this abstract class merely outlines things that are common to most games.
 	/// </summary>
 	internal abstract class GameState
 	{
@@ -133,7 +56,7 @@ namespace BoredWithFriends.Games
 		public List<Player> Winners { get; } = new();
 
 		/// <summary>
-		/// A list containined Players who have lost this game.
+		/// A list containing Players who have lost this game.
 		/// It's possible that players may end up in this list before the game
 		/// ends.
 		/// </summary>
@@ -214,8 +137,8 @@ namespace BoredWithFriends.Games
 		protected virtual void PlayerWins(Player player)
 		{
 			Winners.Add(player);
-			//Treating negative 1 as guest players
-			if (player.PlayerID != -1)
+			
+			if (player.IsGuest)
 			{
 				//TODO: Call database code that adds a win to this player's stats.
 
@@ -234,8 +157,8 @@ namespace BoredWithFriends.Games
 		public virtual void PlayerLoses(Player player)
 		{
 			Losers.Add(player);
-			//Treating negative 1 as guest players
-			if (player.PlayerID != -1)
+			
+			if (player.IsGuest)
 			{
 				//TODO: Call database code that adds a loss to this player's stats.
 

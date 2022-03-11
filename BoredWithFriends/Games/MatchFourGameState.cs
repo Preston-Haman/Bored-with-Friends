@@ -94,7 +94,7 @@ namespace BoredWithFriends.Games
 
 			if (player1 is null)
 			{
-				this.player1 = new TurnBasedPlayer(-1, "Guest1");
+				this.player1 = new TurnBasedPlayer("Guest1");
 			}
 			else
 			{
@@ -103,7 +103,7 @@ namespace BoredWithFriends.Games
 
 			if (player2 is null)
 			{
-				this.player2 = new TurnBasedPlayer(-1, "Guest2");
+				this.player2 = new TurnBasedPlayer("Guest2");
 			}
 			else
 			{
@@ -121,7 +121,7 @@ namespace BoredWithFriends.Games
 		/// Returns true when the player's turn was successful, false if the player cannot make
 		/// the given move.
 		/// <br></br><br></br>
-		/// By playng a token, the game may come to an end. Check <see cref="GameState.GameHasEnded"/> to see
+		/// By playing a token, the game may come to an end. Check <see cref="GameState.GameHasEnded"/> to see
 		/// if this move resulted in ending the game. The game can end here for two reasons; either the player
 		/// who made this move has won, or the board has been completely filled.
 		/// </summary>
