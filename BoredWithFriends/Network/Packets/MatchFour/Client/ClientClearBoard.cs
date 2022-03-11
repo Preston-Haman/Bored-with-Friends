@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BoredWithFriends.Games;
+using BoredWithFriends.Network.Packets.MatchFour.Server;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,9 +16,9 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Client
 	{
 		private bool playerForfeited;
 
-		public ClientClearBoard(bool playerForfeited)
+		public ClientClearBoard()
 		{
-			this.playerForfeited = playerForfeited;
+			playerForfeited = Network.Client.LocalGameState!.GameHasEnded;
 		}
 
 		protected override void ReadImpl()
@@ -26,9 +28,14 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Client
 
 		protected override void RunImpl(Connection con)
 		{
-			//TODO: Get gamestate for this packet and forfeit this player; reply with BoardCleared
-			//If the player is not forfeiting, make sure that the game is over!
-			throw new NotImplementedException();
+			GetPlayerConnectionAndGameState<MatchFourGameState>(con, out PlayerConnection pcon, out MatchFourGameState game);
+			
+			if (playerForfeited |= !game.GameHasEnded)
+			{
+				game.PlayerForfeit(pcon.PlayerID);
+			}
+
+			PacketSendUtility.BroadcastPacket(pcon.Player, new ServerBoardCleared(pcon.Player, playerForfeited));
 		}
 
 		protected override void WriteImpl()

@@ -22,12 +22,19 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Server
 
 		private BoardToken[,] board;
 
-		public ServerSendBoardState(Player activePlayer, BoardToken[,] board)
+		public ServerSendBoardState(MatchFourGameState matchFourGame)
 		{
-			playerTurnID = activePlayer.PlayerID;
-			rows = board.GetLength(0);
-			columns = board.GetLength(1);
-			this.board = board;
+			playerTurnID = matchFourGame.GetCurrentPlayer().PlayerID;
+			rows = matchFourGame.Rows;
+			columns = matchFourGame.Columns;
+			board = new BoardToken[rows, columns];
+			for (int row = 0; row < rows; row++)
+			{
+				for (int column = 0; column < columns; column++)
+				{
+					board[row, column] = matchFourGame.GetTokenAt(row, column);
+				}
+			}
 		}
 
 		protected override void ReadImpl()
@@ -47,11 +54,9 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Server
 
 		protected override void RunImpl()
 		{
-			/*TODO
-			 * Set the board state as given by the server.
-			 * Change the turn to be the player specified.
-			 */
-			throw new NotImplementedException();
+			GetClientGameState<MatchFourGameState>(out MatchFourGameState game);
+
+			game.SetBoardState(playerTurnID, board);
 		}
 
 		protected override void WriteImpl()
