@@ -11,7 +11,7 @@ vertically, horizantally, or diagonally wins. You can play hot seat with your fr
 ## Getting Started w/ Visual Studio
 - Download [VS2022](https://visualstudio.microsoft.com/vs/) with the **.NET Entity Framework 6 Workload**
 - Clone the repo and build the project.
-- Run **Update-Database** in the Package Manager Console to run the script to create the database
+- Run **Update-Database** in the Package Manager Console to run the script that creates the database.
 
 ## Helpful Tutorials
 
