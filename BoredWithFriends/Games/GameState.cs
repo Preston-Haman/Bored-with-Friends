@@ -247,12 +247,12 @@ namespace BoredWithFriends.Games
 
 			if (players.Count < 2)
 			{
-				//The game is over!
-				GameHasEnded = true;
 				foreach (Player winner in players)
 				{
 					PlayerWins(winner);
 				}
+				//The game is over!
+				GameHasEnded = true;
 			}
 		}
 
