@@ -18,9 +18,29 @@ namespace BoredWithFriends.Network
 		private static ClientNetworkHandler clientNetworkHandler = null!;
 
 		/// <summary>
+		/// The <see cref="Player"/> value for <see cref="ClientPlayer"/>.
+		/// </summary>
+		private static Player? clientPlayer = null;
+
+		/// <summary>
 		/// The current player that is logged in for this remote client.
 		/// </summary>
-		public static Player ClientPlayer { get; set; } = null!; //Remember to set from login packet
+		public static Player ClientPlayer //Remember to set from login packet
+		{
+			get
+			{
+				if (clientPlayer is null)
+				{
+					return LocalGameState!.GetCurrentPlayer();
+				}
+				return clientPlayer;
+			}
+
+			set
+			{
+				clientPlayer = value;
+			}
+		}
 
 		/// <summary>
 		/// The local game state for this client; it should be in an identical state
