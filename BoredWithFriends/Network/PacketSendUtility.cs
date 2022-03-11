@@ -65,6 +65,29 @@ namespace BoredWithFriends.Network
 		}
 
 		/// <summary>
+		/// Attempts to send the given <paramref name="packet"/> out on the specified <paramref name="con"/>.
+		/// </summary>
+		/// <param name="con">The <see cref="Connection"/> to send the <paramref name="packet"/> out on.</param>
+		/// <param name="packet">The packet to send out on <paramref name="con"/>.</param>
+		/// <exception cref="InvalidOperationException">If this application is not running as a server.</exception>
+		public static void SendPacket(Connection con, ServerPacket packet)
+		{
+			if (NetHandler is LocalNetworkHandler)
+			{
+				SendLocalPacket(packet);
+				return;
+			}
+
+			if (NetHandler is ServerNetworkHandler)
+			{
+				NetHandler.SendPacket(con, packet);
+				return;
+			}
+
+			throw new InvalidOperationException("Cannot send packets to a client while operating as a client.");
+		}
+
+		/// <summary>
 		/// Attempts to send the given <paramref name="packet"/> to all players associated
 		/// with the game that the given <paramref name="player"/> is taking part in.
 		/// </summary>
