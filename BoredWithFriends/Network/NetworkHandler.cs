@@ -67,9 +67,9 @@ namespace BoredWithFriends.Network
 		{
 			if (IsStarted)
 			{
-				CloseServerConnection();
 				base.Stop();
 			}
+			CloseServerConnection();
 		}
 
 		/// <summary>
