@@ -21,7 +21,7 @@ namespace BoredWithFriends.Network
 		/// <summary>
 		/// A reference to the server connection being used by this client.
 		/// </summary>
-		public ServerConnection? Connection { get; private set; } = null;
+		public ServerConnection? ServerCon { get; private set; } = null;
 
 		/// <summary>
 		/// A reference to the thread that will attempt to connect
@@ -56,7 +56,7 @@ namespace BoredWithFriends.Network
 		/// </summary>
 		public override void Start()
 		{
-			if (Connection is not null)
+			if (ServerCon is not null)
 			{
 				base.Start();
 			}
@@ -86,10 +86,10 @@ namespace BoredWithFriends.Network
 					connectionThread.Interrupt();
 				}
 
-				if (Connection is not null)
+				if (ServerCon is not null)
 				{
-					Connection.Close();
-					Connection = null;
+					ServerCon.Close();
+					ServerCon = null;
 				}
 			}
 		}
@@ -115,12 +115,12 @@ namespace BoredWithFriends.Network
 			{
 				try
 				{
-					while (Connection is null)
+					while (ServerCon is null)
 					{
 						try
 						{
 							//This is a blocking call
-							Connection = new(serverIP, port);
+							ServerCon = new(serverIP, port);
 						}
 						catch (ThreadInterruptedException)
 						{
@@ -133,9 +133,10 @@ namespace BoredWithFriends.Network
 							Thread.Sleep(100);
 						}
 					}
-					if (Connection is not null)
+					if (ServerCon is not null)
 					{
-						AddConnection(Connection);
+						AddConnection(ServerCon);
+						ServerCon.SetConnectionState(ConnectionState.Handshook);
 						PacketSendUtility.SendPacket(new ClientConnect());
 					}
 				}
@@ -238,6 +239,15 @@ namespace BoredWithFriends.Network
 				//Shutdown.
 				server.Stop();
 			}
+		}
+
+		/// <summary>
+		/// Calls <see cref="NetworkHandler.AddConnection(Connection)"/> with the given <paramref name="con"/>.
+		/// </summary>
+		/// <param name="con">A player connection to begin listening for.</param>
+		public void AddPlayerConnection(PlayerConnection con)
+		{
+			AddConnection(con);
 		}
 	}
 
