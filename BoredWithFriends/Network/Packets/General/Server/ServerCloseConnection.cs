@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.General.Server
 {
+	/// <summary>
+	/// Sent by the server to indicate that the connection to the client has been closed.
+	/// </summary>
 	[Packet(typeof(ServerCloseConnection), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerCloseConnection)]
 	internal class ServerCloseConnection : ServerPacket
 	{
 		protected override void ReadImpl()
 		{
-			throw new NotImplementedException();
+			//Nothing to do.
+		}
+
+		protected override void RunImpl(Connection con)
+		{
+			con.Close();
 		}
 
 		protected override void RunImpl()
@@ -21,7 +29,7 @@ namespace BoredWithFriends.Network.Packets.General.Server
 
 		protected override void WriteImpl()
 		{
-			throw new NotImplementedException();
+			//Nothing to do.
 		}
 	}
 }
