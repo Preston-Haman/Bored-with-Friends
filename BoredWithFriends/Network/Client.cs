@@ -19,18 +19,10 @@ namespace BoredWithFriends.Network
 		private static ClientNetworkHandler clientNetworkHandler = null!;
 
 		/// <summary>
-		/// An event that is raised when the client has connected to the server and is ready
-		/// to send credentials.
-		/// <br></br><br></br>
-		/// Subscribers are responsible for calling <see cref="PacketSendUtility.SendPacket(Packets.ClientPacket)"/>
-		/// with an instance of <see cref="Packets.General.Client.ClientLogin"/>.
+		/// A publisher of <see cref="GeneralEvent"/> triggers. When a general event
+		/// occurs, a subscriber can decide to do something about it.
 		/// </summary>
-		public static event EventHandler? LoginReadyEvent;
-
-		/// <summary>
-		/// An event that is raised when the client connection to the server has been terminated.
-		/// </summary>
-		public static event EventHandler? ClientStoppedEvent;
+		public static event EventHandler<GeneralEvent>? GeneralEvents;
 
 		/// <summary>
 		/// The <see cref="Player"/> value for <see cref="ClientPlayer"/>.
@@ -96,46 +88,72 @@ namespace BoredWithFriends.Network
 		}
 
 		/// <summary>
-		/// Raises the <see cref="LoginReadyEvent"/> so subscribers may send the
-		/// login packet with credentials.
+		/// Raises an event of the given <paramref name="eventType"/>.
 		/// </summary>
-		/// <param name="serverConnectedPacket"></param>
-		public static void RaiseLoginReadyEvent(ServerConnected serverConnectedPacket)
+		/// <param name="eventType">The type of event being raised.</param>
+		/// <param name="sender">The triggering object of this event.</param>
+		public static void RaiseEvent(GeneralEvent eventType, object? sender = null)
 		{
-			EventHandler? loginReady = LoginReadyEvent;
+			EventHandler<GeneralEvent>? eventHandler = GeneralEvents;
 
-			if (loginReady is not null)
+			if (eventHandler is not null)
 			{
-				loginReady(serverConnectedPacket, EventArgs.Empty);
-			}
-		}
-
-		/// <summary>
-		/// Raises the <see cref="ClientStoppedEvent"/> so subscribers may
-		/// do something about it.
-		/// </summary>
-		/// <param name="sender">The optional object that is raising this event.</param>
-		public static void RaiseClientStoppedEvent(object? sender = null)
-		{
-			EventHandler? clientStopped = ClientStoppedEvent;
-
-			if (clientStopped is not null)
-			{
-				clientStopped(sender, EventArgs.Empty);
+				eventHandler(sender, eventType);
 			}
 		}
 
 		/// <summary>
 		/// Stops the client network handling, and raises the <see cref="ClientStoppedEvent"/> so subscribers know.
 		/// </summary>
-		public static void StopClient()
+		public static void StopClient(object? sender = null)
 		{
 			if (clientNetworkHandler is not null)
 			{
 				clientNetworkHandler.Stop();
 			}
 
-			RaiseClientStoppedEvent();
+			RaiseEvent(GeneralEvent.ClientStopped, sender);
 		}
+	}
+
+	/// <summary>
+	/// A named general event that can be raised by <see cref="Client.RaiseEvent"/>.
+	/// </summary>
+	internal enum GeneralEvent : byte
+	{
+		/// <summary>
+		/// An event that is raised when the client has connected to the server and is ready
+		/// to send credentials.
+		/// <br></br><br></br>
+		/// Subscribers are responsible for calling <see cref="PacketSendUtility.SendPacket(Packets.ClientPacket)"/>
+		/// with an instance of <see cref="Packets.General.Client.ClientLogin"/>.
+		/// </summary>
+		LoginReady,
+
+		/// <summary>
+		/// An event that is raised when the client has failed to login due to invalid credentials.
+		/// <br></br><br></br>
+		/// The sending object will be the <see cref="ServerApproveLogin"/> packet the server sent.
+		/// </summary>
+		LoginFailedInvalidCredentials,
+
+		/// <summary>
+		/// An event that is raised when the client has failed to login due to the username for a new
+		/// account being unavailable.
+		/// <br></br><br></br>
+		/// The sending object will be the <see cref="ServerApproveLogin"/> packet the server sent.
+		/// </summary>
+		LoginFailedUsernameNotAvailable,
+
+		/// <summary>
+		/// An event that is raised when the client has logged in successfully. The sending
+		/// object will be the <see cref="ServerApproveLogin"/> packet the server sent.
+		/// </summary>
+		LoggedIn,
+
+		/// <summary>
+		/// An event that is raised when the client connection to the server has been terminated.
+		/// </summary>
+		ClientStopped
 	}
 }
