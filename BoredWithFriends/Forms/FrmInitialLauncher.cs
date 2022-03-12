@@ -19,5 +19,11 @@ namespace BoredWithFriends.Forms
 		{
 			Close();
 		}
+
+		private void btnGuest_Click(object sender, EventArgs e)
+		{
+			FrmGameSelection GameSelectForm = new();
+			GameSelectForm.ShowDialog();
+		}
 	}
 }

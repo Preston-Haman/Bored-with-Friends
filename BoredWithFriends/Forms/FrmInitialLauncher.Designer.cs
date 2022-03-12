@@ -173,6 +173,7 @@
             this.btnGuest.TabIndex = 15;
             this.btnGuest.Text = "Play as Guest";
             this.btnGuest.UseVisualStyleBackColor = true;
+            this.btnGuest.Click += new System.EventHandler(this.btnGuest_Click);
             // 
             // btnExit
             // 
