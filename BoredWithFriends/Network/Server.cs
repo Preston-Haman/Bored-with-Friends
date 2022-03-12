@@ -74,12 +74,36 @@ namespace BoredWithFriends.Network
 		}
 
 		/// <summary>
-		/// Adds the given <paramref name="con"/> to <see cref="playerConnections"/>.
+		/// Adds the given <paramref name="con"/> to <see cref="playerConnections"/>,
+		/// then to <see cref="serverNetworkHandler"/> if it is a <see cref="ServerNetworkHandler"/>.
 		/// </summary>
 		/// <param name="con">The connection to register with this server.</param>
 		public static void AddPlayerConnection(PlayerConnection con)
 		{
 			playerConnections.Add(con.Player, con);
+
+			if (serverNetworkHandler is ServerNetworkHandler serverHandler)
+			{
+				serverHandler.AddPlayerConnection(con);
+			}
+		}
+
+		/// <summary>
+		/// If <paramref name="con"/> is of type <see cref="ClientConnection"/>, then
+		/// the underlying TcpClient is adopted (see <seealso cref="ClientConnection.AdoptClient"/>)
+		/// into a new <see cref="PlayerConnection"/> for <paramref name="player"/>, which is then returned.
+		/// </summary>
+		/// <param name="con">A possible <see cref="ClientConnection"/> that the given <paramref name="player"/>
+		/// is using.</param>
+		/// <param name="player">The player using the given <paramref name="con"/>.</param>
+		public static void AuthConnectionAsPlayer(Connection con, Player player)
+		{
+			if (con is ClientConnection ccon)
+			{
+				PlayerConnection pcon = new(ccon.AdoptClient(), player);
+				pcon.SetConnectionState(ConnectionState.Authed);
+				AddPlayerConnection(pcon);
+			}
 		}
 
 		/// <summary>
