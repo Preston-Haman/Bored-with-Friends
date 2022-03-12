@@ -11,8 +11,8 @@ namespace BoredWithFriends.Forms
 		private void btnCreateAccount_Click(object sender, EventArgs e)
 		{
 			//create and open a login form
-			FrmAccountCreation AccountCreationForm = new();
-			AccountCreationForm.ShowDialog();
+			FrmAccountCreation accountCreationForm = new();
+			accountCreationForm.ShowDialog();
 		}
 
 		private void btnExit_Click(object sender, EventArgs e)
@@ -22,8 +22,8 @@ namespace BoredWithFriends.Forms
 
 		private void btnGuest_Click(object sender, EventArgs e)
 		{
-			FrmGameSelection GameSelectForm = new();
-			GameSelectForm.ShowDialog();
+			FrmGameSelection gameSelectionForm = new();
+			gameSelectionForm.ShowDialog();
 		}
 	}
 }
