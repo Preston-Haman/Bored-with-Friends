@@ -6,22 +6,32 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.General.Server
 {
+	/// <summary>
+	/// Sent by the server in response to <see cref="Client.ClientUpdatePassword"/>.
+	/// </summary>
 	[Packet(typeof(ServerApprovePasswordUpdate), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerApprovePasswordUpdate)]
 	internal class ServerApprovePasswordUpdate : ServerPacket
 	{
+		private bool result;
+
+		public ServerApprovePasswordUpdate(bool updateResult)
+		{
+			result = updateResult;
+		}
+
 		protected override void ReadImpl()
 		{
-			throw new NotImplementedException();
+			result = ReadBool();
 		}
 
 		protected override void RunImpl()
 		{
-			throw new NotImplementedException();
+			Network.Client.RaiseEvent(GeneralEvent.PasswordUpdateResultReceived, result);
 		}
 
 		protected override void WriteImpl()
 		{
-			throw new NotImplementedException();
+			WriteBool(result);
 		}
 	}
 }

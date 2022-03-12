@@ -6,22 +6,32 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.General.Server
 {
+	/// <summary>
+	/// Sent by the server when the client has entered into a game lobby.
+	/// </summary>
 	[Packet(typeof(ServerEnterGameLobby), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerEnterGameLobby)]
 	internal class ServerEnterGameLobby : ServerPacket
 	{
+		private BoredWithFriendsProtocol gameChoice;
+
+		public ServerEnterGameLobby(BoredWithFriendsProtocol gameChoice)
+		{
+			this.gameChoice = gameChoice;
+		}
+
 		protected override void ReadImpl()
 		{
-			throw new NotImplementedException();
+			gameChoice = (BoredWithFriendsProtocol) ReadShort();
 		}
 
 		protected override void RunImpl()
 		{
-			throw new NotImplementedException();
+			Network.Client.RaiseEvent(GeneralEvent.EnteredGameLobby, gameChoice);
 		}
 
 		protected override void WriteImpl()
 		{
-			throw new NotImplementedException();
+			WriteShort((short) gameChoice);
 		}
 	}
 }

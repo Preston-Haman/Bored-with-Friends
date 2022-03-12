@@ -6,22 +6,32 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.General.Server
 {
+	/// <summary>
+	/// Sent by the server in response to <see cref="Client.ClientDeleteAccount"/>.
+	/// </summary>
 	[Packet(typeof(ServerAccountDeleted), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerAccountDeleted)]
 	internal class ServerAccountDeleted : ServerPacket
 	{
+		private bool result;
+
+		public ServerAccountDeleted(bool deletionResult)
+		{
+			result = deletionResult;
+		}
+
 		protected override void ReadImpl()
 		{
-			throw new NotImplementedException();
+			result = ReadBool();
 		}
 
 		protected override void RunImpl()
 		{
-			throw new NotImplementedException();
+			Network.Client.RaiseEvent(GeneralEvent.AccountDeletionResult, result);
 		}
 
 		protected override void WriteImpl()
 		{
-			throw new NotImplementedException();
+			WriteBool(result);
 		}
 	}
 }

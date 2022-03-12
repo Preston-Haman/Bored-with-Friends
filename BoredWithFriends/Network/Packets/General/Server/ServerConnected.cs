@@ -6,12 +6,32 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.General.Server
 {
-	[Packet(typeof(ServerConnected), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerConnected)]
+	/// <summary>
+	/// Sent by the server in response to <see cref="Client.ClientConnect"/>.
+	/// </summary>
+	[Packet(typeof(ServerConnected), BoredWithFriendsProtocol.General, (short) GeneralOps.ServerConnected, ConnectionState.Handshook)]
 	internal class ServerConnected : ServerPacket
 	{
+		private const string BORED_WITH_FRIENDS_SERVER_MAGIC = "Is to deny them battle.";
+
+		private string boredWithFriendsMagic = null!;
+
 		protected override void ReadImpl()
 		{
-			throw new NotImplementedException();
+			boredWithFriendsMagic = ReadString();
+		}
+
+		protected override void RunImpl(Connection con)
+		{
+			if (boredWithFriendsMagic == BORED_WITH_FRIENDS_SERVER_MAGIC)
+			{
+				con.SetConnectionState(ConnectionState.Authed);
+				Network.Client.RaiseEvent(GeneralEvent.LoginReady, this);
+			}
+			else
+			{
+				Network.Client.StopClient(this);
+			}
 		}
 
 		protected override void RunImpl()
@@ -21,7 +41,7 @@ namespace BoredWithFriends.Network.Packets.General.Server
 
 		protected override void WriteImpl()
 		{
-			throw new NotImplementedException();
+			WriteString(BORED_WITH_FRIENDS_SERVER_MAGIC);
 		}
 	}
 }

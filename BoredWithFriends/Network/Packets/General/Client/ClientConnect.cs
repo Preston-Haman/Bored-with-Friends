@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BoredWithFriends.Network.Packets.General.Server;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,22 +7,38 @@ using System.Threading.Tasks;
 
 namespace BoredWithFriends.Network.Packets.General.Client
 {
-	[Packet(typeof(ClientConnect), BoredWithFriendsProtocol.General, (short) GeneralOps.ClientConnect)]
+	/// <summary>
+	/// Sent by the client during initial connection to the server.
+	/// </summary>
+	[Packet(typeof(ClientConnect), BoredWithFriendsProtocol.General, (short) GeneralOps.ClientConnect, ConnectionState.Unknown)]
 	internal class ClientConnect : ClientPacket
 	{
+		private const string BORED_WITH_FRIENDS_CLIENT_MAGIC = "The only way to win...";
+
+		private string boredWithFriendsMagic = null!;
+
 		protected override void ReadImpl()
 		{
-			throw new NotImplementedException();
+			boredWithFriendsMagic = ReadString();
 		}
 
 		protected override void RunImpl(Connection con)
 		{
-			throw new NotImplementedException();
+			if (boredWithFriendsMagic == BORED_WITH_FRIENDS_CLIENT_MAGIC)
+			{
+				con.SetConnectionState(ConnectionState.Handshook);
+				PacketSendUtility.SendPacket(con, new ServerConnected());
+			}
+			else
+			{
+				con.Close();
+				Network.Client.StopClient(this);
+			}
 		}
 
 		protected override void WriteImpl()
 		{
-			throw new NotImplementedException();
+			WriteString(BORED_WITH_FRIENDS_CLIENT_MAGIC);
 		}
 	}
 }
