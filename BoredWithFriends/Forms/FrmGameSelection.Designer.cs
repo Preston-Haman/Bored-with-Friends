@@ -38,7 +38,7 @@
             // btMatchFourStart
             // 
             this.btMatchFourStart.Image = ((System.Drawing.Image)(resources.GetObject("btMatchFourStart.Image")));
-            this.btMatchFourStart.Location = new System.Drawing.Point(262, 138);
+            this.btMatchFourStart.Location = new System.Drawing.Point(265, 138);
             this.btMatchFourStart.Name = "btMatchFourStart";
             this.btMatchFourStart.Size = new System.Drawing.Size(94, 89);
             this.btMatchFourStart.TabIndex = 0;
@@ -48,19 +48,20 @@
             // lblGameSelectTitle
             // 
             this.lblGameSelectTitle.AutoSize = true;
-            this.lblGameSelectTitle.Font = new System.Drawing.Font("Segoe UI", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lblGameSelectTitle.Font = new System.Drawing.Font("Sigmar One", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lblGameSelectTitle.Location = new System.Drawing.Point(58, 9);
             this.lblGameSelectTitle.Name = "lblGameSelectTitle";
-            this.lblGameSelectTitle.Size = new System.Drawing.Size(435, 81);
+            this.lblGameSelectTitle.Size = new System.Drawing.Size(569, 99);
             this.lblGameSelectTitle.TabIndex = 0;
             this.lblGameSelectTitle.Text = "Select A Game!";
             // 
             // lblMatchFourTitle
             // 
             this.lblMatchFourTitle.AutoSize = true;
+            this.lblMatchFourTitle.Font = new System.Drawing.Font("Sigmar One", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lblMatchFourTitle.Location = new System.Drawing.Point(253, 99);
             this.lblMatchFourTitle.Name = "lblMatchFourTitle";
-            this.lblMatchFourTitle.Size = new System.Drawing.Size(83, 20);
+            this.lblMatchFourTitle.Size = new System.Drawing.Size(118, 25);
             this.lblMatchFourTitle.TabIndex = 2;
             this.lblMatchFourTitle.Text = "Match Four";
             // 
