@@ -103,7 +103,8 @@ namespace BoredWithFriends.Network
 		}
 
 		/// <summary>
-		/// Stops the client network handling, and raises the <see cref="ClientStoppedEvent"/> so subscribers know.
+		/// Stops the client network handling, and raises the <see cref="GeneralEvent.ClientStopped"/>
+		/// event so subscribers know.
 		/// </summary>
 		public static void StopClient(object? sender = null)
 		{
@@ -162,6 +163,35 @@ namespace BoredWithFriends.Network
 		/// packet the server sent.
 		/// </summary>
 		AccountManagementReady,
+
+		/// <summary>
+		/// An event that is raised when the client has attempted to update their password,
+		/// and the server has responded with the result.
+		/// <br></br><br></br>
+		/// The sending object will be a bool where a true value indicates that the password
+		/// has updated successfully, and a false value indicates that the update was not
+		/// accepted.
+		/// </summary>
+		PasswordUpdateResultReceived,
+
+		/// <summary>
+		/// An event that is raised when the client has attempted to delete their account, and
+		/// the server has responded with the result.
+		/// <br></br><br></br>
+		/// The sending object will be a bool where a true value indicates that the account has
+		/// been deleted, and a false value indicates that the account was not deleted.
+		/// </summary>
+		AccountDeletionResult,
+
+		/// <summary>
+		/// An event that is raised when the client has attempted to join an online game, and
+		/// the server did not have any other players to match them with. This indicates
+		/// that the client has to wait for another player to join in order to begin playing.
+		/// <br></br><br></br>
+		/// The sending object will be a <see cref="Packets.BoredWithFriendsProtocol"/> value
+		/// indicating the selected game.
+		/// </summary>
+		EnteredGameLobby,
 
 		/// <summary>
 		/// An event that is raised when the client connection to the server has been terminated.
