@@ -129,6 +129,12 @@ namespace BoredWithFriends.Network
 			ServerInfo = serverIP;
 			client.Connect(serverIP);
 		}
+
+		public override void Close()
+		{
+			base.Close();
+			Client.StopClient(this);
+		}
 	}
 
 	/// <summary>
@@ -145,6 +151,11 @@ namespace BoredWithFriends.Network
 		public LocalConnection(Player player) : base(null!, player)
 		{
 			//Nothing to do.
+		}
+
+		public override void Close()
+		{
+			//Nothing to close.
 		}
 	}
 
