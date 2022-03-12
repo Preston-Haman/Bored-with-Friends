@@ -1,4 +1,4 @@
-﻿using BoredWithFriends.Games;
+using BoredWithFriends.Games;
 using BoredWithFriends.Models;
 using System;
 using System.Collections.Generic;
@@ -51,6 +51,7 @@ namespace BoredWithFriends.Data
 
 				UpdateLastPlayTime(user);
 				return userLogin;
+
 			}
 			else
 			{
@@ -65,6 +66,7 @@ namespace BoredWithFriends.Data
 		/// <returns>The PlayerStatistics Object related to the userName from PlayerLogin table</returns>
 		/// <exception cref="ArgumentNullException">If a PlayerStatistics PlayerID is not found in the table</exception>
 		public static PlayerStatistics GetPlayerStatistics(Player user)
+
 		{
 			DatabaseContext database = new();
 
@@ -165,6 +167,7 @@ namespace BoredWithFriends.Data
 			database.Update(userStats);
 			database.SaveChangesAsync();
 		}
+
 		/// <summary>
 		/// Adds a loss when a player loses a game 
 		/// </summary>
@@ -185,7 +188,7 @@ namespace BoredWithFriends.Data
 		/// Adds up total time logged in during a session in milisceonds
 		/// to reflect how long a user has been logged in since creation.
 		/// </summary>
-		/// <exception cref="NotImplementedException"></exception>
+		/// <param name="user">Player to add time to</param>
 		public static void AddPlayTime(Player user)
 		{
 			PlayerStatistics userStats = GetPlayerStatistics(user);
