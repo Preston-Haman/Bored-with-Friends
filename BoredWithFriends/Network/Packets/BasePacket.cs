@@ -136,6 +136,25 @@ namespace BoredWithFriends.Network.Packets
 		/// <summary>
 		/// Server-side convenience method.
 		/// <br></br><br></br>
+		/// Casts the given <paramref name="con"/> as a <see cref="PlayerConnection"/> and returns it,
+		/// if possible.
+		/// </summary>
+		/// <param name="con">The <see cref="Connection"/> to convert.</param>
+		/// <returns><paramref name="con"/> as a <see cref="PlayerConnection"/>.</returns>
+		/// <exception cref="InvalidOperationException">If the connection is not a <see cref="PlayerConnection"/>.</exception>
+		protected PlayerConnection GetPlayerConnection(Connection con)
+		{
+			if (con is PlayerConnection pcon)
+			{
+				return pcon;
+			}
+			throw new InvalidOperationException($"Cannot execute {this.GetType().Name} packet " +
+					$"while the connection is not of type {nameof(PlayerConnection)}");
+		}
+
+		/// <summary>
+		/// Server-side convenience method.
+		/// <br></br><br></br>
 		/// Outputs <paramref name="pcon"/> and <paramref name="game"/> if <paramref name="con"/> is a
 		/// <see cref="PlayerConnection"/> playing a game of type <typeparamref name="Game"/>.
 		/// </summary>
@@ -145,7 +164,7 @@ namespace BoredWithFriends.Network.Packets
 		/// <param name="game">The <see cref="GameState"/> of type <typeparamref name="Game"/> that
 		/// <paramref name="pcon"/> is playing.</param>
 		/// <exception cref="InvalidOperationException">If <paramref name="con"/> is not a <see cref="PlayerConnection"/>
-		/// or if </exception>
+		/// or if the current game is not of type <typeparamref name="Game"/>.</exception>
 		protected void GetPlayerConnectionAndGameState<Game>(Connection con, out PlayerConnection pcon, out Game game)
 			where Game : GameState
 		{
