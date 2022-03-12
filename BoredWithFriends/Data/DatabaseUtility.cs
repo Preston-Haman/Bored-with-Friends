@@ -49,7 +49,7 @@ namespace BoredWithFriends.Data
 			{
 				Player user = new(userLogin.PlayerID, userLogin.UserName);
 
-				UpdateLastPlayTime(user);
+				UpdateLastLoginTime(user);
 				return userLogin;
 
 			}
@@ -206,16 +206,16 @@ namespace BoredWithFriends.Data
 		}
 
 		/// <summary>
-		/// Changes LastPlayTime to reflect the last time the user logged in
+		/// Changes LastLoginTime to current DateTime (now).
 		/// </summary>
-		/// <param name="user">user to change LastPlayTime</param>
-		public static void UpdateLastPlayTime(Player user)
+		/// <param name="user">user to change LastLoginTime of</param>
+		public static void UpdateLastLoginTime(Player user)
 		{
-			PlayerStatistics userStats = GetPlayerStatistics(user);
-			userStats.LastPlayedTime = DateTime.Now;
+			PlayerLogin userLogin = GetPlayerLogin(user.Name);
+			userLogin.LastLoginTime = DateTime.Now;
 
 			DatabaseContext database = new();
-			database.Update(userStats);
+			database.Update(userLogin);
 			database.SaveChangesAsync();
 		}
 	}
