@@ -535,6 +535,12 @@ namespace BoredWithFriends.Network
 									//Try again next time
 									packetsToSend.Enqueue(tuple);
 								}
+
+								//Sort of a weird place to put a special case, but...
+								if (tuple.Item2 is Packets.General.Server.ServerCloseConnection)
+								{
+									tuple.Item1.Close();
+								}
 							}
 						}
 						int sleepTime = (int) (80 - stopwatch.ElapsedMilliseconds);
