@@ -34,7 +34,7 @@ namespace BoredWithFriends.Network
 
 			if (NetHandler is ClientNetworkHandler client)
 			{
-				client.SendPacket(client.Connection!, packet);
+				client.SendPacket(client.ServerCon!, packet);
 				return;
 			}
 
