@@ -23,7 +23,12 @@ namespace BoredWithFriends.Models
 
 		public string Password { get; set; } = null!;
 
-		public DateTime LastLoginTime { get; set; }
+		public DateTime LastLoginTime { get; private set; }
+
+		public void SetLastLoginToNow()
+		{
+			LastLoginTime = DateTime.Now;
+		}
 
 	}
 }
