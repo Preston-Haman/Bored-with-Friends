@@ -133,7 +133,8 @@ namespace BoredWithFriends.Network
 		/// <summary>
 		/// An event that is raised when the client has failed to login due to invalid credentials.
 		/// <br></br><br></br>
-		/// The sending object will be the <see cref="ServerApproveLogin"/> packet the server sent.
+		/// The sending object will be a <see cref="LoginResult"/> built from the packet
+		/// the server sent.
 		/// </summary>
 		LoginFailedInvalidCredentials,
 
@@ -141,15 +142,26 @@ namespace BoredWithFriends.Network
 		/// An event that is raised when the client has failed to login due to the username for a new
 		/// account being unavailable.
 		/// <br></br><br></br>
-		/// The sending object will be the <see cref="ServerApproveLogin"/> packet the server sent.
+		/// The sending object will be a <see cref="LoginResult"/> built from the packet
+		/// the server sent.
 		/// </summary>
 		LoginFailedUsernameNotAvailable,
 
 		/// <summary>
 		/// An event that is raised when the client has logged in successfully. The sending
-		/// object will be the <see cref="ServerApproveLogin"/> packet the server sent.
+		/// object will be a <see cref="LoginResult"/> built from the packet
+		/// the server sent.
 		/// </summary>
 		LoggedIn,
+
+		/// <summary>
+		/// An event that is raised when the client has attempted to open Account Management
+		/// and has received their account information from the server.
+		/// <br></br><br></br>
+		/// The sending object will be the <see cref="Models.PlayerStatistics"/> built from the
+		/// packet the server sent.
+		/// </summary>
+		AccountManagementReady,
 
 		/// <summary>
 		/// An event that is raised when the client connection to the server has been terminated.
