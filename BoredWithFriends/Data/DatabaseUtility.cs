@@ -26,7 +26,7 @@ namespace BoredWithFriends.Data
 				PlayerStatisticsID = new()
 			};
 
-			DatabaseContext database = new();
+			using DatabaseContext database = new();
 			database.AddAsync(newUser);
 			database.SaveChangesAsync();
 		}
@@ -39,7 +39,7 @@ namespace BoredWithFriends.Data
 		/// /// <exception cref="ArgumentNullException">If a userName is not found in the PlayerLogin table</exception>
 		public static PlayerLogin GetPlayerLogin(string userName)
 		{
-			DatabaseContext database = new();
+			using DatabaseContext database = new();
 
 			PlayerLogin? userLogin = (from logins in database.PlayerLogins
 								 where logins.UserName == userName
@@ -49,8 +49,8 @@ namespace BoredWithFriends.Data
 			{
 				Player user = new(userLogin.PlayerID, userLogin.UserName);
 
-				UpdateLastLoginTime(userLogin);
-
+				userLogin.SetLastLoginToNow();
+				database.SaveChangesAsync();
 				return userLogin;
 
 			}
@@ -69,7 +69,7 @@ namespace BoredWithFriends.Data
 		public static PlayerStatistics GetPlayerStatistics(Player user)
 
 		{
-			DatabaseContext database = new();
+			using DatabaseContext database = new();
 
 			PlayerStatistics? userStats = database.PlayerStatistics.Find(user.PlayerID);
 
@@ -91,7 +91,7 @@ namespace BoredWithFriends.Data
 		/// <exception cref="ArgumentNullException">If a PlayerStatistics PlayerID is not found in the table</exception>
 		public static PlayerStatistics GetPlayerStatistics(PlayerLogin userLogin)
 		{
-			DatabaseContext database = new();
+			using DatabaseContext database = new();
 
 			PlayerStatistics? userStats = database.PlayerStatistics.Find(userLogin.PlayerID);
 
@@ -113,7 +113,7 @@ namespace BoredWithFriends.Data
 		/// <returns>True if found</returns>
 		public static bool NameExists(string userName)
 		{
-			DatabaseContext database = new();
+			using DatabaseContext database = new();
 			PlayerLogin? user = (from logins in database.PlayerLogins
 								 where logins.UserName == userName
 								 select logins).SingleOrDefault();
@@ -134,7 +134,7 @@ namespace BoredWithFriends.Data
 		{
 			user.Password = newPassword;
 
-			DatabaseContext database = new();
+			using DatabaseContext database = new();
 			database.Update(user);
 			database.SaveChangesAsync();
 		}
@@ -147,7 +147,7 @@ namespace BoredWithFriends.Data
 		{
 			PlayerStatistics userStatistics = GetPlayerStatistics(user);
 			
-			DatabaseContext database = new();			
+			using DatabaseContext database = new();			
 
 			database.Remove(user);
 			database.Remove(userStatistics);
@@ -164,7 +164,7 @@ namespace BoredWithFriends.Data
 			userStats.Wins++;
 			userStats.RoundsPlayed++;
 
-			DatabaseContext database = new();
+			using DatabaseContext database = new();
 			database.Update(userStats);
 			database.SaveChangesAsync();
 		}
@@ -179,7 +179,7 @@ namespace BoredWithFriends.Data
 			userStats.Losses++;
 			userStats.RoundsPlayed++;
 
-			DatabaseContext database = new();
+			using DatabaseContext database = new();
 			database.Update(userStats);
 			database.SaveChangesAsync();
 			
@@ -200,23 +200,10 @@ namespace BoredWithFriends.Data
 
 			userStats.TotalPlayTime += timeInMiliseconds;
 
-			DatabaseContext database = new();
+			using DatabaseContext database = new();
 			database.Update(userStats);
 			database.SaveChangesAsync();
 
-		}
-
-		/// <summary>
-		/// Changes LastLoginTime to current DateTime (now).
-		/// </summary>
-		/// <param name="userLogin">user to change LastLoginTime of</param>
-		public static void UpdateLastLoginTime(PlayerLogin userLogin)
-		{
-			userLogin.SetLastLoginToNow();
-
-			DatabaseContext database = new();
-			database.Update(userLogin);
-			database.SaveChangesAsync();
 		}
 	}
 }
