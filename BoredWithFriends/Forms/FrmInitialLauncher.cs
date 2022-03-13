@@ -11,13 +11,19 @@ namespace BoredWithFriends.Forms
 		private void btnCreateAccount_Click(object sender, EventArgs e)
 		{
 			//create and open a login form
-			FrmAccountCreation AccountCreationForm = new();
-			AccountCreationForm.ShowDialog();
+			FrmAccountCreation accountCreationForm = new();
+			accountCreationForm.ShowDialog();
 		}
 
 		private void btnExit_Click(object sender, EventArgs e)
 		{
 			Close();
+		}
+
+		private void btnGuest_Click(object sender, EventArgs e)
+		{
+			FrmGameSelection gameSelectionForm = new();
+			gameSelectionForm.ShowDialog();
 		}
 	}
 }

@@ -46,8 +46,8 @@ namespace BoredWithFriends.Forms
 				database.SaveChanges();
 
 				Close();
-				FrmAccountConfirmation ConfirmNotice = new();
-				ConfirmNotice.ShowDialog();
+				FrmAccountConfirmation accountConfirmationForm = new();
+				accountConfirmationForm.ShowDialog();
 			}
 		}
 		/// <summary>
