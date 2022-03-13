@@ -115,29 +115,31 @@ namespace BoredWithFriends.Network
 			{
 				try
 				{
-					while (ServerCon is null)
+					try
 					{
-						try
-						{
-							//This is a blocking call
-							ServerCon = new(serverIP, port);
-						}
-						catch (ThreadInterruptedException)
-						{
-							//We failed to connect before the client gave up.
-						}
-						catch (Exception e)
-						{
-							Debug.Fail($"{e.GetType().Name}: {e.Message}", e.StackTrace);
-							//Try again in a moment.
-							Thread.Sleep(100);
-						}
+						//This is a blocking call
+						ServerCon = new(serverIP, port);
 					}
-					if (ServerCon is not null)
+					catch (ThreadInterruptedException)
+					{
+						//We failed to connect before the client gave up.
+					}
+					catch (Exception e)
+					{
+						Debug.Fail($"{e.GetType().Name}: {e.Message}", e.StackTrace);
+						//Try again in a moment.
+						Thread.Sleep(100);
+					}
+					
+					if (ServerCon is not null && ServerCon.IsOpen())
 					{
 						AddConnection(ServerCon);
 						ServerCon.SetConnectionState(ConnectionState.Handshook);
 						PacketSendUtility.SendPacket(new ClientConnect());
+					}
+					else
+					{
+						Client.RaiseEvent(GeneralEvent.ConnectionFailed);
 					}
 				}
 				catch (ThreadInterruptedException)

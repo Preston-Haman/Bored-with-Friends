@@ -108,12 +108,21 @@ namespace BoredWithFriends.Network
 		/// </summary>
 		public static void StopClient(object? sender = null)
 		{
+			bool raiseEvent = true;
 			if (clientNetworkHandler is not null)
 			{
+				if (clientNetworkHandler.ServerCon is not null)
+				{
+					//The connection closing will raise it.
+					raiseEvent = false;
+				}
 				clientNetworkHandler.Stop();
 			}
 
-			RaiseEvent(GeneralEvent.ClientStopped, sender);
+			if (raiseEvent)
+			{
+				RaiseEvent(GeneralEvent.ClientStopped, sender);
+			}
 		}
 	}
 
@@ -122,6 +131,14 @@ namespace BoredWithFriends.Network
 	/// </summary>
 	internal enum GeneralEvent : byte
 	{
+		/// <summary>
+		/// An event that is raised when the client tried to connect to the server but failed.
+		/// <br></br><br></br>
+		/// No further attempts to connect to the remote server will be attempted. It's the
+		/// subscriber's responsibility to re-attempt the connection if desired.
+		/// </summary>
+		ConnectionFailed,
+
 		/// <summary>
 		/// An event that is raised when the client has connected to the server and is ready
 		/// to send credentials.
