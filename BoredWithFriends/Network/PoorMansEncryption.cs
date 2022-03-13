@@ -18,8 +18,8 @@ namespace BoredWithFriends.Network
 		/// <summary>
 		/// The string that the <see cref="PAD"/> is made from.
 		/// </summary>
-		private const string STRING_PAD = "Because it is so clear, it takes longer to realize;" +
-			"if you recognize this pad as shoddy encryption, then the packet was sent long ago.";
+		private const string STRING_PAD = "Because it is so clear, it takes longer to realize it;" +
+			"if you immediately recognize this pad as shoddy encryption, then the packet was sent long ago.";
 
 		/// <summary>
 		/// A pad to use for encryption.
