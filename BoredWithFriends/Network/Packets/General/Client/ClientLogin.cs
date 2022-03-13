@@ -1,4 +1,6 @@
-﻿using BoredWithFriends.Network.Packets.General.Server;
+﻿using BoredWithFriends.Data;
+using BoredWithFriends.Games;
+using BoredWithFriends.Network.Packets.General.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,16 +40,12 @@ namespace BoredWithFriends.Network.Packets.General.Client
 		protected override void RunImpl(Connection con)
 		{
 			string password = PoorMansEncryption.Decrypt(encryptedPassword, key1, key2, key3);
-			throw new NotImplementedException();
 
-			//TODO: check database for user credentials/create them if necessary
-
-			bool validUser = false;
-			if (validUser)
+			if (DatabaseContext.AreValidCredentials(username, password, createNew, out int playerID))
 			{
-				//TODO: Get player, run these:
-				//Network.Server.AuthConnectionAsPlayer(con, player);
-				//PacketSendUtility.SendPacket(player, new ServerApproveLogin(true, player.PlayerID, player.Name, createNew));
+				Player player = new(playerID, username);
+				Network.Server.AuthConnectionAsPlayer(con, player);
+				PacketSendUtility.SendPacket(player, new ServerApproveLogin(true, player.PlayerID, player.Name, createNew));
 			}
 			else
 			{

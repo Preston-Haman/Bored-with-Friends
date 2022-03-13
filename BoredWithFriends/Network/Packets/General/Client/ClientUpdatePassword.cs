@@ -1,4 +1,6 @@
-﻿using BoredWithFriends.Network.Packets.General.Server;
+﻿using BoredWithFriends.Data;
+using BoredWithFriends.Models;
+using BoredWithFriends.Network.Packets.General.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,14 +43,11 @@ namespace BoredWithFriends.Network.Packets.General.Client
 
 		protected override void RunImpl(Connection con)
 		{
-			throw new NotImplementedException();
 			PlayerConnection pcon = GetPlayerConnection(con);
 			string currentPassword = PoorMansEncryption.Decrypt(encryptedCurrentPassword, key1, key2, key3);
 			string newPassword = PoorMansEncryption.Decrypt(encryptedNewPassword, key4, key5, key6);
-
-			//TODO: Call database password update code
-			bool updateResult = false;
-
+			
+			bool updateResult = DatabaseContext.UpdatePassword(pcon.Player, currentPassword, newPassword);
 			PacketSendUtility.SendPacket(pcon.Player, new ServerApprovePasswordUpdate(updateResult));
 		}
 

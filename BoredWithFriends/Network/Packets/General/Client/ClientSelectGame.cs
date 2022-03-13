@@ -27,12 +27,7 @@ namespace BoredWithFriends.Network.Packets.General.Client
 
 		protected override void RunImpl(Connection con)
 		{
-			//TODO: Place the client into a server queue for the selected game
-			//match them with the next player that connects.
-			//Reply with PacketSendUtility.SendPacket(GetPlayerConnection(con).Player, new ServerEnterGameLobby());
-			//if they are queued, or handle starting the game for them with their matched players.
-			throw new NotImplementedException();
-			
+			Network.Server.RegisterPlayerForLobby(GetPlayerConnection(con).Player, gameChoice);
 		}
 
 		protected override void WriteImpl()

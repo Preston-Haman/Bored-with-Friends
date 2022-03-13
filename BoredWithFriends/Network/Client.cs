@@ -205,10 +205,22 @@ namespace BoredWithFriends.Network
 		/// the server did not have any other players to match them with. This indicates
 		/// that the client has to wait for another player to join in order to begin playing.
 		/// <br></br><br></br>
-		/// The sending object will be a <see cref="Packets.BoredWithFriendsProtocol"/> value
-		/// indicating the selected game.
+		/// The sending object will be a <see cref="LobbyResult"/> indicating the state
+		/// of the lobby.
 		/// </summary>
 		EnteredGameLobby,
+
+		/// <summary>
+		/// An event that is raised when the client has attempted to join an online game, and
+		/// the server has matched the client with the other necessary players. This indicates
+		/// that the client is starting the game; the GUI should be updated accordingly.
+		/// <br></br><br></br>
+		/// The sending object will be a <see cref="GameStartResult"/> indicating the state
+		/// of the game. It is the subscriber's responsibility to create the necessary
+		/// <see cref="GameState"/> that corresponds to the started game and register it
+		/// in the <see cref="Client.LocalGameState"/> property.
+		/// </summary>
+		GameStart,
 
 		/// <summary>
 		/// An event that is raised when the client connection to the server has been terminated.

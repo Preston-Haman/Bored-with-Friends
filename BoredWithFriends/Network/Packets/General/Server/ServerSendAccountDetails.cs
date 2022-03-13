@@ -1,4 +1,5 @@
-﻿using BoredWithFriends.Games;
+﻿using BoredWithFriends.Data;
+using BoredWithFriends.Games;
 using BoredWithFriends.Models;
 using System;
 using System.Collections.Generic;
@@ -18,8 +19,7 @@ namespace BoredWithFriends.Network.Packets.General.Server
 
 		public ServerSendAccountDetails(Player player)
 		{
-			//TODO: Get player stats from database
-			throw new NotImplementedException();
+			stats = DatabaseContext.GetPlayerStatistics(player);
 		}
 
 		protected override void ReadImpl()

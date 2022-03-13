@@ -1,4 +1,6 @@
 ﻿using BoredWithFriends.Games;
+using BoredWithFriends.Network.Packets;
+using BoredWithFriends.Network.Packets.General.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +24,11 @@ namespace BoredWithFriends.Network
 		/// The active games mapped by Player.
 		/// </summary>
 		private static readonly Dictionary<Player, GameState> playerGames = new();
+
+		/// <summary>
+		/// A set of <see cref="LobbyGameState"/>s mapped by the game they are for.
+		/// </summary>
+		private static readonly Dictionary<BoredWithFriendsProtocol, LobbyGameState> lobbies = new();
 
 		/// <summary>
 		/// The network handler in charge of sending and receiving packets.
@@ -70,6 +77,11 @@ namespace BoredWithFriends.Network
 		public static void PlayerDisconnected(PlayerConnection con)
 		{
 			playerConnections.Remove(con.Player);
+			if (playerGames.TryGetValue(con.Player, out GameState? game))
+			{
+				Player player = game.GetPlayerByID(con.PlayerID, out bool isSpectator);
+				game.PlayerLeaves(player, isSpectator);
+			}
 			playerGames.Remove(con.Player);
 		}
 
@@ -103,6 +115,33 @@ namespace BoredWithFriends.Network
 				PlayerConnection pcon = new(ccon.AdoptClient(), player);
 				pcon.SetConnectionState(ConnectionState.Authed);
 				AddPlayerConnection(pcon);
+			}
+		}
+
+		/// <summary>
+		/// Adds the given <paramref name="player"/> to the lobby of the game matching the
+		/// <paramref name="gameChoice"/> protocol.
+		/// </summary>
+		/// <param name="player">The player to add to the lobby.</param>
+		/// <param name="gameChoice">The protocol of the player's selected game.</param>
+		public static void RegisterPlayerForLobby(Player player, BoredWithFriendsProtocol gameChoice)
+		{
+			if (!lobbies.ContainsKey(gameChoice))
+			{
+				lobbies.Add(gameChoice, new LobbyGameState(gameChoice, new NoGuiGame()));
+			}
+
+			lobbies.TryGetValue(gameChoice, out LobbyGameState? lobby);
+
+			lobby!.QueuePlayer(player);
+			if (gameChoice.TryCreateNewGame(lobby!, out GameState? newGame))
+			{
+				RegisterGameState(newGame!);
+				PacketSendUtility.BroadcastPacket(player, new ServerStartGame(gameChoice, newGame!));
+			}
+			else
+			{
+				PacketSendUtility.SendPacket(player, new ServerEnterGameLobby(lobby));
 			}
 		}
 

@@ -1,4 +1,6 @@
-﻿using BoredWithFriends.Network.Packets.General.Server;
+﻿using BoredWithFriends.Data;
+using BoredWithFriends.Games;
+using BoredWithFriends.Network.Packets.General.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,13 +34,11 @@ namespace BoredWithFriends.Network.Packets.General.Client
 
 		protected override void RunImpl(Connection con)
 		{
-			throw new NotImplementedException();
+			Player player = GetPlayerConnection(con).Player;
 			string password = PoorMansEncryption.Decrypt(encryptedPassword, key1, key2, key3);
-
-			//TODO: Call database code to delete the account.
-			bool result = false;
-
-			PacketSendUtility.SendPacket(GetPlayerConnection(con).Player, new ServerAccountDeleted(result));
+			
+			bool result = DatabaseContext.DeleteUser(player, password);
+			PacketSendUtility.SendPacket(player, new ServerAccountDeleted(result));
 		}
 
 		protected override void WriteImpl()
