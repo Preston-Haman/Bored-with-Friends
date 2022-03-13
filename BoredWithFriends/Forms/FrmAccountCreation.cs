@@ -34,16 +34,7 @@ namespace BoredWithFriends.Forms
 
 			if (IsValidLogin(userName, password, confirmPassword))
 			{
-
-				PlayerLogin newUser = new()
-				{
-					UserName = userName,
-					Password = password,
-				};
-
-				DatabaseContext database = new();
-				database.Add(newUser);
-				database.SaveChanges();
+				DatabaseContext.CreateNewPlayer(userName, password);
 
 				Close();
 				FrmAccountConfirmation accountConfirmationForm = new();
@@ -63,7 +54,7 @@ namespace BoredWithFriends.Forms
 			ClearWarnings();
 
 			bool nameBlank = string.IsNullOrEmpty(userName);
-			bool nameTaken = NameExists(userName);
+			bool nameExists = DatabaseContext.NameExists(userName);
 			bool passwordBlank = string.IsNullOrEmpty(password);
 			bool passwordsMatch = password.Equals(confirmPassword);
 
@@ -71,7 +62,7 @@ namespace BoredWithFriends.Forms
 			{
 				lblWarningInvalidName.Text = "Username cannot be blank";				
 			}
-			else if (nameTaken)
+			else if (nameExists)
 			{
 				lblWarningInvalidName.Text = "This username has been taken";
 			}
@@ -84,7 +75,7 @@ namespace BoredWithFriends.Forms
 				lblWarningInvalidPassword.Text = "Passwords do not match";
 			}
 
-			return (!nameBlank && !nameTaken && !passwordBlank && passwordsMatch);
+			return (!nameBlank && !nameExists && !passwordBlank && passwordsMatch);
 		}
 
 		/// <summary>
@@ -95,26 +86,5 @@ namespace BoredWithFriends.Forms
 			lblWarningInvalidName.Text = string.Empty;
 			lblWarningInvalidPassword.Text = string.Empty;
 		}
-
-		/// <summary>
-		/// Checks if a user name exists in the database
-		/// </summary>
-		/// <param name="userName">The user name to search for</param>
-		/// <returns>True if found</returns>
-		private static bool NameExists(string userName)
-		{
-			DatabaseContext database = new();
-
-			PlayerLogin? nameSearch = (from logins in database.PlayerLogins
-								   where logins.UserName == userName
-								   select logins).SingleOrDefault();
-
-			if (nameSearch is null)
-			{
-				return false;
-			}
-			return true;
-		}
-
 	}
 }
