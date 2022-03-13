@@ -11,24 +11,70 @@ namespace BoredWithFriends.Data
 	internal partial class DatabaseContext
 	{
 		/// <summary>
+		/// Validates a player login attempt. If true is returned, the <paramref name="playerID"/>
+		/// will be populated properly; else it will be set to -1. True will be returned if either
+		/// a new account with the given credentials was created, or an existing account with the
+		/// given credentials exists.
+		/// <br></br><br></br>
+		/// If <paramref name="createNew"/> is true:<br></br>
+		/// An attempt will be made to create a new Player in the database, if it succeeds the new
+		/// player's playerID will be returned.
+		/// <br></br><br></br>
+		/// if <paramref name="createNew"/> is false:<br></br>
+		/// An attempt to identify the given credentials as an existing user will be made. If the
+		/// user exists, and the passwords match, then true will be returned.
+		/// </summary>
+		/// <param name="username">The name of the player.</param>
+		/// <param name="password">The password of the player.</param>
+		/// <param name="createNew">Whether or not a new account should be made with the given credentials.</param>
+		/// <param name="playerID">The PlayerID of the valid player, or -1 if the credentials are invalid.</param>
+		/// <returns>True if the given credentials are valid, false otherwise.</returns>
+		public static bool AreValidCredentials(string username, string password, bool createNew, out int playerID)
+		{
+			playerID = -1;
+			if (createNew)
+			{
+				if (NameExists(username))
+				{
+					return false;
+				}
+
+				playerID = CreateNewPlayer(username, password);
+				return true;
+			}
+			else
+			{
+				PlayerLogin user = GetPlayerLogin(username);
+				if (user.Password == password)
+				{
+					playerID = user.PlayerID;
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/// <summary>
 		/// Creates a new player account, and a new set of statistics
-		/// in the database
+		/// in the database and returns the new account's PlayerID.
 		/// </summary>
 		/// <param name="userName">The username to add to this account</param>
-		/// <param name="password">The password used for this acount</param>
-		public static void CreateNewPlayer(string userName, string password)
+		/// <param name="password">The password used for this account</param>
+		/// <returns>The PlayerID of the new account.</returns>
+		public static int CreateNewPlayer(string userName, string password)
 		{
 			PlayerLogin newUser = new()
 			{
 				UserName = userName,
 				Password = password,
-				//set playerstatistics ID and create related object with defaults
+				//set player statistics ID and create related object with defaults
 				PlayerStatisticsID = new()
 			};
 
 			using DatabaseContext database = new();
 			database.AddAsync(newUser);
-			database.SaveChangesAsync();
+			database.SaveChanges(); //Can't do an async call because we need the PlayerID.
+			return newUser.PlayerID;
 		}
 
 		/// <summary>
@@ -140,6 +186,32 @@ namespace BoredWithFriends.Data
 		}
 
 		/// <summary>
+		/// Updates the given <paramref name="player"/> password with the <paramref name="newPassword"/>
+		/// if <paramref name="currentPassword"/> matches the password in the database. If the passwords
+		/// matched, and an update was attempted, true is returned; false otherwise.
+		/// </summary>
+		/// <param name="player">The player who wants to update their password.</param>
+		/// <param name="currentPassword">The current password of the <paramref name="player"/>.</param>
+		/// <param name="newPassword">The new password to set.</param>
+		/// <returns>True if an attempt to update the password in the database was made.</returns>
+		public static bool UpdatePassword(Player player, string currentPassword, string newPassword)
+		{
+			using DatabaseContext database = new();
+			PlayerLogin? userLogin = (from logins in database.PlayerLogins
+									  where logins.UserName == player.Name
+									  select logins).SingleOrDefault();
+
+			if (userLogin is not null && userLogin.Password == currentPassword)
+			{
+				userLogin.Password = newPassword;
+				database.Update(userLogin);
+				database.SaveChangesAsync();
+				return true;
+			}
+			return false;
+		}
+
+		/// <summary>
 		/// Deletes all data in database linked to a PlayerLogin
 		/// </summary>
 		/// <param name="userName">The user name of the data to delete</param>
@@ -152,6 +224,25 @@ namespace BoredWithFriends.Data
 			database.Remove(user);
 			database.Remove(userStatistics);
 			database.SaveChangesAsync();
+		}
+
+		/// <summary>
+		/// Checks if the given <paramref name="password"/> matches the password on record for
+		/// the given <paramref name="player"/>, and delete's the player's account if so. If the
+		/// account has been deleted, true is returned; false otherwise.
+		/// </summary>
+		/// <param name="player"></param>
+		/// <param name="password"></param>
+		/// <returns>True if the player's account was deleted; false otherwise.</returns>
+		public static bool DeleteUser(Player player, string password)
+		{
+			PlayerLogin user = GetPlayerLogin(player.Name);
+			if (user.Password == password)
+			{
+				DeleteUser(user);
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -186,7 +277,7 @@ namespace BoredWithFriends.Data
 		}
 
 		/// <summary>
-		/// Adds up total time logged in during a session in milisceonds
+		/// Adds up total time logged in during a session in milliseconds
 		/// to reflect how long a user has been logged in since creation.
 		/// </summary>
 		/// <param name="user">Player to add time to</param>
