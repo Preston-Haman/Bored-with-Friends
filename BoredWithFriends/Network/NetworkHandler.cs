@@ -127,8 +127,6 @@ namespace BoredWithFriends.Network
 					catch (Exception e)
 					{
 						Debug.Fail($"{e.GetType().Name}: {e.Message}", e.StackTrace);
-						//Try again in a moment.
-						Thread.Sleep(100);
 					}
 					
 					if (ServerCon is not null && ServerCon.IsOpen())
