@@ -72,13 +72,7 @@ namespace BoredWithFriends.Network
 		/// <exception cref="InvalidOperationException">If this application is not running as a server.</exception>
 		public static void SendPacket(Connection con, ServerPacket packet)
 		{
-			if (NetHandler is LocalNetworkHandler)
-			{
-				SendLocalPacket(packet);
-				return;
-			}
-
-			if (NetHandler is ServerNetworkHandler)
+			if (NetHandler is LocalNetworkHandler || NetHandler is ServerNetworkHandler)
 			{
 				NetHandler.SendPacket(con, packet);
 				return;
