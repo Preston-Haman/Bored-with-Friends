@@ -26,7 +26,7 @@ namespace BoredWithFriends.Forms
 			//Set Form colours
 			form.BackColor = Color.DimGray;
 			form.ForeColor = SystemColors.ActiveCaptionText; //Do we want this? 
-			form.StartPosition = FormStartPosition.CenterParent;
+			form.StartPosition = FormStartPosition.CenterScreen;
 
 			//Apply theme to controls
 			foreach (Control control in form.Controls)

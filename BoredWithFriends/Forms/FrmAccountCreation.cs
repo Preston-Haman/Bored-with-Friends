@@ -1,5 +1,8 @@
 ﻿using BoredWithFriends.Data;
 using BoredWithFriends.Models;
+using BoredWithFriends.Network;
+using BoredWithFriends.Network.Packets;
+using BoredWithFriends.Network.Packets.General.Client;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,11 +17,24 @@ namespace BoredWithFriends.Forms
 {
 	public partial class FrmAccountCreation : Form
 	{
+		private readonly bool local;
 
-		public FrmAccountCreation()
+		private readonly string serverIP;
+
+		private readonly int port;
+
+		public FrmAccountCreation(string username = "", string password = "", bool local = false, string serverIP = "127.0.0.1", int port = 7777)
 		{
 			InitializeComponent();
 			this.ApplyGeneralTheme();
+
+			Client.GeneralEvents += GeneralEventHandler;
+
+			txtUserName.Text = username;
+			txtPassword.Text = password;
+			this.local = local;
+			this.serverIP = serverIP;
+			this.port = port;
 		}
 
 		private void btnBackToLogin_Click(object sender, EventArgs e)
@@ -34,38 +50,43 @@ namespace BoredWithFriends.Forms
 
 			if (IsValidLogin(userName, password, confirmPassword))
 			{
-				DatabaseContext.CreateNewPlayer(userName, password);
-
-				Close();
-				FrmAccountConfirmation accountConfirmationForm = new();
-				accountConfirmationForm.ShowDialog();
+				if (local)
+				{
+					//Local server
+					Server.StartServer();
+					BasePacket.RunLocally(new ClientLogin(userName, password, true), new LocalClientConnection());
+				}
+				else
+				{
+					Client.StartClient(serverIP, port);
+				}
 			}
 		}
+
 		/// <summary>
-		/// Checks if a user name and password is valid to be entered into datbase
+		/// Checks that <paramref name="userName"/> and <paramref name="password"/> are not
+		/// empty, and that <paramref name="confirmPassword"/> matches <paramref name="password"/>.
+		/// If all checks are okay, then true is returned; otherwise false is returned and error
+		/// messages are populated on the GUI.
 		/// </summary>
-		/// <param name="userName">Username for login to insert to database</param>
-		/// <param name="password">Password for login to insert to database</param>
+		/// <param name="userName">Username for login</param>
+		/// <param name="password">Password for login</param>
 		/// <param name="confirmPassword">Confirmation of password to ensure it is the one desired</param>
-		/// <returns></returns>
+		/// <returns>True if all checks pass; false otherwise.</returns>
 		private bool IsValidLogin(string userName, string password, string confirmPassword)
 		{
 			//clear warnings to adjust to warnings to needed input adjustments
 			ClearWarnings();
 
 			bool nameBlank = string.IsNullOrEmpty(userName);
-			bool nameExists = DatabaseContext.NameExists(userName);
 			bool passwordBlank = string.IsNullOrEmpty(password);
-			bool passwordsMatch = password.Equals(confirmPassword);
+			bool passwordsMatch = password == confirmPassword;
 
 			if (nameBlank)
 			{
 				lblWarningInvalidName.Text = "Username cannot be blank";				
 			}
-			else if (nameExists)
-			{
-				lblWarningInvalidName.Text = "This username has been taken";
-			}
+
 			if (passwordBlank)
 			{
 				lblWarningInvalidPassword.Text = "Password cannot be blank";
@@ -75,7 +96,7 @@ namespace BoredWithFriends.Forms
 				lblWarningInvalidPassword.Text = "Passwords do not match";
 			}
 
-			return (!nameBlank && !nameExists && !passwordBlank && passwordsMatch);
+			return (!nameBlank && !passwordBlank && passwordsMatch);
 		}
 
 		/// <summary>
@@ -85,6 +106,32 @@ namespace BoredWithFriends.Forms
 		{
 			lblWarningInvalidName.Text = string.Empty;
 			lblWarningInvalidPassword.Text = string.Empty;
+		}
+
+		private void GeneralEventHandler(object? sender, GeneralEvent genEvent)
+		{
+			switch (genEvent)
+			{
+				case GeneralEvent.ConnectionFailed:
+					string msg = "The server did not respond. Please verify that the IP and port information" +
+						"is correct, and that the server is online, then try again.";
+					MessageBox.Show(this, msg, "Connection Error:", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+					break;
+				case GeneralEvent.LoginReady:
+					PacketSendUtility.SendPacket(new ClientLogin(txtUserName.Text, txtPassword.Text, true));
+					break;
+				case GeneralEvent.LoginFailedUsernameNotAvailable:
+					lblWarningInvalidName.Text = "This username has been taken";
+					break;
+				case GeneralEvent.LoggedIn:
+					Close();
+					Client.GeneralEvents -= GeneralEventHandler;
+					new FrmAccountConfirmation().ShowDialog();
+					break;
+				default:
+					//Do nothing; unsupported event.
+					break;
+			}
 		}
 	}
 }

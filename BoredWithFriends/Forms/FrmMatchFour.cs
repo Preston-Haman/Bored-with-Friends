@@ -18,16 +18,12 @@ namespace BoredWithFriends.Forms
 		/// <summary>
 		/// Creates a playable Match Four GUI.
 		/// </summary>
-		public FrmMatchFour()
+		public FrmMatchFour(MatchFourGameState game)
 		{
-			//For testing purposes.
 			InitializeComponent();
 			this.ApplyGeneralTheme();
-		}
 
-		public IMatchFourGui GetMatchFourGuiCallback()
-		{
-			return ctrlMatchFourBoard;
+			game.GameGui = ctrlMatchFourBoard;
 		}
 
 		private void btnClearBoard_Click(object sender, EventArgs e)
