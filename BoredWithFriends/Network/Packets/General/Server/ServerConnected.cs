@@ -14,7 +14,7 @@ namespace BoredWithFriends.Network.Packets.General.Server
 	{
 		private const string BORED_WITH_FRIENDS_SERVER_MAGIC = "Is to deny them battle.";
 
-		private string boredWithFriendsMagic = null!;
+		private string boredWithFriendsMagic = BORED_WITH_FRIENDS_SERVER_MAGIC;
 
 		protected override void ReadImpl()
 		{

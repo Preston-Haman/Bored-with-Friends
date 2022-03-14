@@ -15,7 +15,7 @@ namespace BoredWithFriends.Network.Packets.General.Client
 	{
 		private const string BORED_WITH_FRIENDS_CLIENT_MAGIC = "The only way to win...";
 
-		private string boredWithFriendsMagic = null!;
+		private string boredWithFriendsMagic = BORED_WITH_FRIENDS_CLIENT_MAGIC;
 
 		protected override void ReadImpl()
 		{
@@ -32,7 +32,6 @@ namespace BoredWithFriends.Network.Packets.General.Client
 			else
 			{
 				con.Close();
-				Network.Client.StopClient(this);
 			}
 		}
 
