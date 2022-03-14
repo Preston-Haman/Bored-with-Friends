@@ -119,6 +119,7 @@ namespace BoredWithFriends.Games
 		public GameState(IGeneralGameGui generalGameGui)
 		{
 			this.generalGameGui = generalGameGui;
+			generalGameGui.GameStateChanged(this);
 		}
 
 		/// <summary>
@@ -232,6 +233,11 @@ namespace BoredWithFriends.Games
 		/// <param name="player">The player who wishes to give up.</param>
 		protected virtual void PlayerForfeit(Player player)
 		{
+			if (GameHasEnded)
+			{
+				return;
+			}
+
 			//TODO: This logic could be better...
 			//TODO: Determine if we should track forfeiting separately from losses.
 			PlayerLoses(player);

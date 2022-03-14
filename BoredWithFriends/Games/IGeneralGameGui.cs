@@ -12,6 +12,14 @@
 	internal interface IGeneralGameGui
 	{
 		/// <summary>
+		/// Called when an implementation for this interface is registered with a
+		/// <see cref="GameState"/> class. Implementors may use this method to
+		/// display the new GameState on the GUI.
+		/// </summary>
+		/// <param name="newGameState">The new <see cref="GameState"/>.</param>
+		public void GameStateChanged(GameState newGameState);
+
+		/// <summary>
 		/// Called when a player has been added to a gamestate; implementors may use
 		/// this method to display the player addition on the GUI.
 		/// </summary>
@@ -59,6 +67,11 @@
 		}
 
 		public void DeclareGameEnd(GameState game)
+		{
+			//Do nothing.
+		}
+
+		public void GameStateChanged(GameState newGameState)
 		{
 			//Do nothing.
 		}
