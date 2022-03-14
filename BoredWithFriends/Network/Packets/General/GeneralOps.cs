@@ -27,7 +27,7 @@ namespace BoredWithFriends.Network.Packets.General
 		ServerApprovePasswordUpdate,
 		ServerAccountDeleted,
 		ServerEnterGameLobby,
-		ServerAddPlayer,
+		ServerAddLobbyPlayer,
 		ServerAddSpectator,
 		ServerStartGame,
 		ServerCloseConnection
