@@ -30,7 +30,7 @@ namespace BoredWithFriends.Network
 		{
 			byte[] inputBytes = Encoding.Unicode.GetBytes(input);
 
-			int random = RND.Next(1, int.MaxValue);
+			int random = RND.Next(1, (int.MaxValue / modWith) - modWith); //Don't allow overflow
 
 			key1 = RND.Next(1, int.MaxValue);
 
