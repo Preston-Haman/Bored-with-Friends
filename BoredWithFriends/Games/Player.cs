@@ -82,7 +82,7 @@
 			lock (lockableObject)
 			{
 				PlayerID = nextGuestID--;
-				Name = name;
+				Name = name + PlayerID;
 			}
 		}
 
