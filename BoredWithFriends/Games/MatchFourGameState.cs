@@ -68,7 +68,7 @@ namespace BoredWithFriends.Games
 		/// Users of this gamestate must provide an implementation of this interface so changes
 		/// to the gamestate can be reflected upon the GUI.
 		/// </summary>
-		private readonly IMatchFourGui gameGui;
+		public IMatchFourGui GameGui { get; set; } = new NoGuiMatchFour();
 
 		/// <summary>
 		/// A player competing in this match.
@@ -112,17 +112,15 @@ namespace BoredWithFriends.Games
 		/// <param name="player1">The player that will be using Blue tokens.</param>
 		/// <param name="player2">The player that will be using Red tokens.</param>
 		/// <param name="generalGameGui">See <see cref="GameState.generalGameGui"/>.</param>
-		/// <param name="gameGui">See <see cref="gameGui"/>.</param>
-		public MatchFourGameState(int rows, int columns, Player player1 = null!, Player player2 = null!, IGeneralGameGui generalGameGui = null!, IMatchFourGui gameGui = null!) :
+		/// <param name="gameGui">See <see cref="GameGui"/>.</param>
+		public MatchFourGameState(int rows, int columns, Player player1 = null!, Player player2 = null!, IGeneralGameGui generalGameGui = null!):
 			base(generalGameGui is not null ? generalGameGui : new NoGuiGame())
 		{
-			this.gameGui = gameGui is not null ? gameGui : new NoGuiMatchFour();
-
 			Rows = rows < 6 ? 6 : rows;
 			Columns = columns < 7 ? 7 : columns;
 
-			this.player1 = player1 is null ? new TurnBasedPlayer("Guest1") : new TurnBasedPlayer(player1);
-			this.player2 = player2 is null ? new TurnBasedPlayer("Guest2") : new TurnBasedPlayer(player2);
+			this.player1 = player1 is null ? new TurnBasedPlayer("Guest") : new TurnBasedPlayer(player1);
+			this.player2 = player2 is null ? new TurnBasedPlayer("Guest") : new TurnBasedPlayer(player2);
 			
 			this.player1.IsPlayerTurn = true;
 			
@@ -148,7 +146,7 @@ namespace BoredWithFriends.Games
 				}
 			}
 			tokenPlayCount = 0;
-			gameGui.UpdateBoardDisplay(this);
+			GameGui.UpdateBoardDisplay(this);
 		}
 
 		public void SetBoardState(int playerTurnID, BoardToken[,] newBoard)
@@ -170,7 +168,7 @@ namespace BoredWithFriends.Games
 					}
 				}
 			}
-			gameGui.UpdateBoardDisplay(this);
+			GameGui.UpdateBoardDisplay(this);
 			SetPlayerTurn(GetPlayerByID(playerTurnID, out _));
 		}
 
@@ -198,7 +196,7 @@ namespace BoredWithFriends.Games
 		public bool CheckPlayIsPossible(TurnBasedPlayer player, int column, out int playedRow)
 		{
 			playedRow = -1;
-			if (player != player1 || player != player2)
+			if (player != player1 && player != player2)
 			{
 				System.Diagnostics.Debug.WriteLine("A spectator of Match Four attempted to make a play!");
 				return false;
@@ -249,12 +247,12 @@ namespace BoredWithFriends.Games
 				BoardToken playerToken = board[playedRow, playedColumn] = player == player1 ? BoardToken.Blue : BoardToken.Red;
 				tokenPlayCount++;
 
-				CheckWinCondition(player, playerToken, playedColumn, playedRow);
+				GameGui.UpdateBoardDisplay(this);
 				
 				//Give a turn to the opponent player
 				SetPlayerTurn(player == player1 ? player2 : player1);
 
-				gameGui.UpdateBoardDisplay(this);
+				CheckWinCondition(player, playerToken, playedColumn, playedRow);
 				if (tokenPlayCount == Rows * Columns)
 				{
 					//Game is over because board is full!
@@ -433,6 +431,14 @@ namespace BoredWithFriends.Games
 				PlayerForfeit(player);
 			}
 			base.PlayerLeaves(player, spectator);
+		}
+
+		protected override void PlayerForfeit(Player player)
+		{
+			if (tokenPlayCount > 0)
+			{
+				base.PlayerForfeit(player);
+			}
 		}
 
 		/// <inheritdoc/>
