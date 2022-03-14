@@ -47,8 +47,8 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Server
 		{
 			GetClientGameState<MatchFourGameState>(out MatchFourGameState game);
 			TurnBasedPlayer player = game.GetPlayerByID(playerID, out _);
-
-			bool validPlay = game.PlayGamePiece(player, column, out int playedRow);
+			
+			bool validPlay = game.CheckPlayIsPossible(player, column, out int playedRow);
 			validPlay &= row == playedRow;
 			validPlay &= game.GetTokenAt(row, column) == token;
 			validPlay &= game.GetTurnCount() == turnCount;
@@ -57,6 +57,10 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Server
 			{
 				//Something is wrong with our board!
 				PacketSendUtility.SendPacket(new ClientRequestBoardState());
+			}
+			else
+			{
+				game.PlayGamePiece(player, column, out int _);
 			}
 		}
 

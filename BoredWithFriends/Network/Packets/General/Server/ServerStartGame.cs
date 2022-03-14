@@ -14,10 +14,10 @@ namespace BoredWithFriends.Network.Packets.General.Server
 
 		private List<Player> players;
 
-		public ServerStartGame(BoredWithFriendsProtocol protocol, GameState game)
+		public ServerStartGame(BoredWithFriendsProtocol protocol, List<Player> players)
 		{
 			this.protocol = protocol;
-			players = game.Players;
+			this.players = players;
 		}
 
 		protected override void ReadImpl()

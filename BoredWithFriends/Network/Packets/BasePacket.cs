@@ -313,6 +313,11 @@ namespace BoredWithFriends.Network.Packets
 			}
 		}
 
+		public static void RunLocally(BasePacket packet, LocalClientConnection con)
+		{
+			packet.RunImpl(con);
+		}
+
 		public static void RunLocally(BasePacket packet, LocalConnection con)
 		{
 			packet.RunImpl(con);

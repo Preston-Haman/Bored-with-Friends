@@ -33,8 +33,9 @@ namespace BoredWithFriends.Network.Packets.MatchFour.Server
 		{
 			GetClientGameState<MatchFourGameState>(out MatchFourGameState game);
 			
-			if (playerForfeited)
+			if (playerForfeited && !game.GameHasEnded)
 			{
+				//Check if game is over for local play... TODO: needs a better check.
 				game.PlayerForfeit(playerID);
 			}
 

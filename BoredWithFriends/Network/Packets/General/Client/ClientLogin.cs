@@ -45,7 +45,7 @@ namespace BoredWithFriends.Network.Packets.General.Client
 			{
 				Player player = new(playerID, username);
 				Network.Server.AuthConnectionAsPlayer(con, player);
-				PacketSendUtility.SendPacket(player, new ServerApproveLogin(true, player.PlayerID, player.Name, createNew));
+				PacketSendUtility.SendPacket(con, new ServerApproveLogin(true, player.PlayerID, player.Name, createNew));
 			}
 			else
 			{
