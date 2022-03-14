@@ -46,19 +46,41 @@ namespace BoredWithFriends.Network
 		private static bool isLocal = false;
 
 		/// <summary>
+		/// The value for <see cref="LocalGameState"/>.
+		/// </summary>
+		private static GameState? localGameState;
+
+		/// <summary>
 		/// The currently active GameState for this application.
 		/// </summary>
-		public static GameState? LocalGameState { get; set; }
+		public static GameState? LocalGameState
+		{
+			get
+			{
+				return localGameState;
+			}
+
+			set
+			{
+				localGameState = value;
+				if (value is not null)
+				{
+					RegisterGameState(value);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Starts the server functionality of this application with the given network handler.
 		/// </summary>
 		/// <param name="handler"></param>
-		public static void StartServer(NetworkHandler handler)
+		public static void StartServer(bool online = false)
 		{
+			NetworkHandler handler = online ? new ServerNetworkHandler() : new LocalNetworkHandler();
+
 			if (!isStarted)
 			{
-				isLocal = handler is LocalNetworkHandler;
+				isLocal = !online;
 
 				serverNetworkHandler = handler;
 				serverNetworkHandler.Start();
@@ -112,7 +134,7 @@ namespace BoredWithFriends.Network
 		{
 			if (con is ClientConnection ccon)
 			{
-				PlayerConnection pcon = new(ccon.AdoptClient(), player);
+				PlayerConnection pcon = isLocal ? new LocalConnection(player) : new PlayerConnection(ccon.AdoptClient(), player);
 				pcon.SetConnectionState(ConnectionState.Authed);
 				AddPlayerConnection(pcon);
 			}
@@ -137,7 +159,11 @@ namespace BoredWithFriends.Network
 			if (gameChoice.TryCreateNewGame(lobby!, out GameState? newGame))
 			{
 				RegisterGameState(newGame!);
-				PacketSendUtility.BroadcastPacket(player, new ServerStartGame(gameChoice, newGame!));
+				PacketSendUtility.BroadcastPacket(player, new ServerStartGame(gameChoice, newGame!.Players));
+			}
+			else if (isLocal)
+			{
+				PacketSendUtility.SendPacket(player, new ServerStartGame(gameChoice, new List<Player>() { player }));
 			}
 			else
 			{
@@ -153,6 +179,10 @@ namespace BoredWithFriends.Network
 		{
 			foreach (Player p in gameState.Players)
 			{
+				if (playerGames.ContainsKey(p))
+				{
+					_ = playerGames.Remove(p);
+				}
 				playerGames.Add(p, gameState);
 			}
 		}
@@ -165,6 +195,10 @@ namespace BoredWithFriends.Network
 		/// <param name="gameState">The game the given <paramref name="player"/> is a part of.</param>
 		public static void RegisterGameState(Player player, GameState gameState)
 		{
+			if (playerGames.ContainsKey(player))
+			{
+				_ = playerGames.Remove(player);
+			}
 			playerGames.Add(player, gameState);
 		}
 
@@ -204,6 +238,14 @@ namespace BoredWithFriends.Network
 			{
 				return con;
 			}
+
+			if (isLocal)
+			{
+				LocalConnection lcon = new(player);
+				AddPlayerConnection(lcon);
+				return lcon;
+			}
+
 			throw new ArgumentException($"No such {nameof(player)} has been registered.");
 		}
 
