@@ -160,6 +160,24 @@ namespace BoredWithFriends.Network
 	}
 
 	/// <summary>
+	/// Represents a local player. This implementation passes null to the base
+	/// classes for the TcpClient; the consequences of this are that reading
+	/// and writing from this connection will throw an exception.
+	/// </summary>
+	internal class LocalClientConnection : ClientConnection
+	{
+		public LocalClientConnection() : base(null!)
+		{
+			//Nothing to do.
+		}
+
+		public override void Close()
+		{
+			//Nothing to close.
+		}
+	}
+
+	/// <summary>
 	/// Represents the state of a <see cref="Connection"/>. State in this case does not
 	/// refer to the status of the network connection; rather, it refers to the state
 	/// of the source of the connection.
