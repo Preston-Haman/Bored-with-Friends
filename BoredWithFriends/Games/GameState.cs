@@ -7,77 +7,27 @@ using System.Threading.Tasks;
 namespace BoredWithFriends.Games
 {
 	/// <summary>
-	/// The most basic representation of a Player. This class holds a reference to the player's
-	/// username and their ID -- both from the database (except when the player is a guest).
-	/// </summary>
-	internal class Player
-	{
-		/// <summary>
-		/// The player's PlayerID from the database; if this is set to -1,
-		/// then this player is a guest (not stored in the database).
-		/// </summary>
-		public int PlayerID { get; } = -1;
-
-		/// <summary>
-		/// The username of the player in the database. This name is unique to this player
-		/// so long as they are not a guest. When set as a guest, the player's name should
-		/// still be unique; but it will not be enforced by the database.
-		/// </summary>
-		public string Name { get; protected set; }
-
-		/// <summary>
-		/// Creates a simple Player with the specified PlayerID and username. These values
-		/// should come from the database. If the player is a guest, then the PlayerID should
-		/// be set as -1.
-		/// </summary>
-		/// <param name="playerID">The PlayerID from the database, or -1 for a guest.</param>
-		/// <param name="name">The username of the player; this may display on screen.</param>
-		public Player(int playerID, string name)
-		{
-			PlayerID = playerID;
-			Name = name;
-		}
-
-		/// <summary>
-		/// Returns this player's username for display.
-		/// </summary>
-		/// <returns>The player's username for display.</returns>
-		public override string ToString()
-		{
-			return Name;
-		}
-	}
-
-	/// <summary>
-	/// A simple Player class that maintains a boolean value for tracking the player's turn.
-	/// </summary>
-	internal class TurnBasedPlayer : Player
-	{
-		/// <summary>
-		/// For turn based games, this will be true when the player may perform an action;
-		/// otherwise, it will be false. A false value indicates that the player should not
-		/// be allowed to perform input on the current game state.
-		/// </summary>
-		public bool IsPlayerTurn { get; set; }
-
-		/// <inheritdoc/>
-		public TurnBasedPlayer(int playerID, string name) : base(playerID, name)
-		{
-			//Nothing else to do for now.
-		}
-
-		public TurnBasedPlayer(Player player) : base(player.PlayerID, player.Name)
-		{
-			//Nothing else to do for now.
-		}
-	}
-
-	/// <summary>
 	/// GameStates represent an entire Game that can be played by Players. Each game is
-	/// different, so this absract class merely outlines things that are common to most games.
+	/// different, so this abstract class merely outlines things that are common to most games.
 	/// </summary>
 	internal abstract class GameState
 	{
+		/// <summary>
+		/// Users of this gamestate must provide an implementation of this interface so changes
+		/// to the gamestate can be reflected upon the GUI.
+		/// </summary>
+		protected readonly IGeneralGameGui generalGameGui;
+
+		/// <summary>
+		/// The bool value for <see cref="GameHasStarted"/>.
+		/// </summary>
+		private bool gameHasStarted = false;
+
+		/// <summary>
+		/// The bool value for <see cref="GameHasEnded"/>.
+		/// </summary>
+		private bool gameHasEnded = false;
+
 		/// <summary>
 		/// The list of players involved in competition with this game.
 		/// </summary>
@@ -89,14 +39,56 @@ namespace BoredWithFriends.Games
 		public List<Player> Spectators { get; } = new();
 
 		/// <summary>
+		/// A list containing Players who have won this game.
+		/// This list will not be populated before the game ends.
+		/// </summary>
+		public List<Player> Winners { get; } = new();
+
+		/// <summary>
+		/// A list containing Players who have lost this game.
+		/// It's possible that players may end up in this list before the game
+		/// ends.
+		/// </summary>
+		public List<Player> Losers { get; } = new();
+
+		/// <summary>
 		/// If this game has started, then this should be true.
 		/// </summary>
-		protected bool GameHasStarted { get; set; } = false;
+		protected bool GameHasStarted
+		{
+			get { return gameHasStarted; }
+
+			set
+			{
+				gameHasStarted = value;
+				try
+				{
+					Player currentPlayer = GetCurrentPlayer();
+					generalGameGui.UpdateActivePlayer(this, currentPlayer);
+				}
+				catch (Exception)
+				{
+					//Ignore; this game doesn't have turns.
+				}
+			}
+		}
 
 		/// <summary>
 		/// If this game is over, then this should be true.
 		/// </summary>
-		public bool GameHasEnded { get; protected set; } = false;
+		public bool GameHasEnded
+		{
+			get { return gameHasEnded; }
+
+			protected set
+			{
+				gameHasEnded = value;
+				if (gameHasEnded)
+				{
+					generalGameGui.DeclareGameEnd(this);
+				}
+			}
+		}
 
 		/// <summary>
 		/// If this game is over, this will be true only if there was a winner.
@@ -116,17 +108,14 @@ namespace BoredWithFriends.Games
 		}
 
 		/// <summary>
-		/// A list containing Players who have won this game.
-		/// This list will not be populated before the game ends.
+		/// Creates a new gamestate with the specified GUI handler.
 		/// </summary>
-		public List<Player> Winners { get; } = new();
-
-		/// <summary>
-		/// A list containined Players who have lost this game.
-		/// It's possible that players may end up in this list before the game
-		/// ends.
-		/// </summary>
-		public List<Player> Losers { get; } = new();
+		/// <param name="generalGameGUI">The general GUI handler for this game.</param>
+		public GameState(IGeneralGameGui generalGameGui)
+		{
+			this.generalGameGui = generalGameGui;
+			generalGameGui.GameStateChanged(this);
+		}
 
 		/// <summary>
 		/// Adds Players to this game as competitors (as opposed to a spectators).
@@ -143,6 +132,7 @@ namespace BoredWithFriends.Games
 			foreach (Player p in competingPlayers)
 			{
 				Players.Add(p);
+				generalGameGui.AddPlayer(this, p);
 			}
 		}
 
@@ -156,18 +146,95 @@ namespace BoredWithFriends.Games
 			foreach (Player p in players)
 			{
 				Spectators.Add(p);
+				generalGameGui.AddPlayer(this, p, true);
 			}
 		}
 
 		/// <summary>
+		/// Iterates the list of <see cref="Players"/> and <see cref="Spectators"/> to find the
+		/// <see cref="Player"/> with the given <paramref name="playerID"/> and returns it.
+		/// </summary>
+		/// <param name="playerID">The PlayerID of the player to retrieve.</param>
+		/// <returns>The <see cref="Player"/> with the given <paramref name="playerID"/>.</returns>
+		/// <exception cref="ArgumentException">If there is no such player.</exception>
+		public virtual Player GetPlayerByID(int playerID, out bool isSpectator)
+		{
+			//Check competing players.
+			foreach (Player player in Players)
+			{
+				if (player.PlayerID == playerID)
+				{
+					isSpectator = false;
+					return player;
+				}
+			}
+
+			//Check spectators
+			foreach (Player player in Spectators)
+			{
+				if (player.PlayerID == playerID)
+				{
+					isSpectator = true;
+					return player;
+				}
+			}
+
+			throw new ArgumentException("No such player is registered with this gamestate.");
+		}
+
+		/// <summary>
+		/// Removes the given player from the gamestate.
+		/// <br></br><br></br>
+		/// Subclasses should override this method with an implementation that
+		/// forfeits the player when necessary. The default implementation only
+		/// removes the given <paramref name="player"/> from either
+		/// <see cref="Players"/> or <see cref="Spectators"/> based on the value
+		/// of <paramref name="spectator"/>.
+		/// </summary>
+		/// <param name="player">The <see cref="Player"/> leaving the game.</param>
+		/// <param name="spectator">Whether or not <paramref name="player"/> is a spectator.</param>
+		public virtual void PlayerLeaves(Player player, bool spectator = false)
+		{
+			//Might have to do this based on how Remove works...
+			//player = GetPlayerByID(player.PlayerID);
+
+			if (spectator)
+			{
+				Players.Remove(player);
+			}
+			else
+			{
+				Spectators.Remove(player);
+			}
+
+			generalGameGui.RemovePlayer(this, player, spectator);
+		}
+
+		/// <summary>
+		/// Retrieves the player with the given <paramref name="playerID"/> and calls
+		/// <see cref="PlayerForfeit(Player)"/>.
+		/// </summary>
+		/// <param name="playerID">The ID of the player who wishes to give up.</param>
+		public void PlayerForfeit(int playerID)
+		{
+			PlayerForfeit(GetPlayerByID(playerID, out _));
+		}
+
+		/// <summary>
 		/// Sets this player as a loser of the game by player choice.
-		/// 
-		/// If a subclass of GameState allows for Player teams, it must override
-		/// this method to determine if this forfeiture ends the game.
+		/// <br></br><br></br>
+		/// If a subclass allows for Player teams, or supports more than one competing player,
+		/// it must override this method to determine if this forfeiture ends the game.
 		/// </summary>
 		/// <param name="player">The player who wishes to give up.</param>
-		public virtual void PlayerForfeit(Player player)
+		protected virtual void PlayerForfeit(Player player)
 		{
+			if (GameHasEnded)
+			{
+				return;
+			}
+
+			//TODO: This logic could be better...
 			//TODO: Determine if we should track forfeiting separately from losses.
 			PlayerLoses(player);
 
@@ -182,13 +249,23 @@ namespace BoredWithFriends.Games
 
 			if (players.Count < 2)
 			{
-				//The game is over!
-				GameHasEnded = true;
 				foreach (Player winner in players)
 				{
 					PlayerWins(winner);
 				}
+				//The game is over!
+				GameHasEnded = true;
 			}
+		}
+
+		/// <summary>
+		/// Retrieves the player with the given <paramref name="playerID"/> and calls
+		/// <see cref="PlayerWins(Player)"/>.
+		/// </summary>
+		/// <param name="playerID">The player ID of a player who has won this game.</param>
+		protected void PlayerWins(int playerID)
+		{
+			PlayerWins(GetPlayerByID(playerID, out _));
 		}
 
 		/// <summary>
@@ -199,16 +276,25 @@ namespace BoredWithFriends.Games
 		/// <br></br><br></br>
 		/// For a list of winners, see <seealso cref="Winners"/>.
 		/// </summary>
-		/// <param name="player">A Player who has won this game.</param>
+		/// <param name="player">A player who has won this game.</param>
 		protected virtual void PlayerWins(Player player)
 		{
 			Winners.Add(player);
-			//Treating negative 1 as guest players
-			if (player.PlayerID != -1)
+			if (!player.IsGuest)
 			{
 				//TODO: Call database code that adds a win to this player's stats.
 
 			}
+		}
+
+		/// <summary>
+		/// Retrieves the player with the given <paramref name="playerID"/> and calls
+		/// <see cref="PlayerLoses(Player)"/>.
+		/// </summary>
+		/// <param name="playerID"></param>
+		protected void PlayerLoses(int playerID)
+		{
+			PlayerLoses(GetPlayerByID(playerID, out _));
 		}
 
 		/// <summary>
@@ -219,17 +305,22 @@ namespace BoredWithFriends.Games
 		/// <br></br><br></br>
 		/// For a list of losers, see <seealso cref="Losers"/>.
 		/// </summary>
-		/// <param name="player">A Player who has lost this game.</param>
-		public virtual void PlayerLoses(Player player)
+		/// <param name="player">A player who has lost this game.</param>
+		protected virtual void PlayerLoses(Player player)
 		{
 			Losers.Add(player);
-			//Treating negative 1 as guest players
-			if (player.PlayerID != -1)
+			if (!player.IsGuest)
 			{
 				//TODO: Call database code that adds a loss to this player's stats.
 
 			}
 		}
+
+		/// <summary>
+		/// Returns this GameState to its original starting point as if the Game had just been
+		/// created. The current players and spectators are kept.
+		/// </summary>
+		public abstract void ResetGame();
 
 		/// <summary>
 		/// Returns the maximum number of competing players for this game.
@@ -244,6 +335,5 @@ namespace BoredWithFriends.Games
 		/// </summary>
 		/// <returns>The Player who is currently being allowed a turn.</returns>
 		public abstract Player GetCurrentPlayer();
-
 	}
 }
