@@ -72,7 +72,7 @@ namespace BoredWithFriends.Data
 			};
 
 			using DatabaseContext database = new();
-			database.AddAsync(newUser);
+			database.Add(newUser);
 			database.SaveChanges(); //Can't do an async call because we need the PlayerID.
 			return newUser.PlayerID;
 		}
@@ -96,9 +96,8 @@ namespace BoredWithFriends.Data
 				Player user = new(userLogin.PlayerID, userLogin.UserName);
 
 				userLogin.SetLastLoginToNow();
-				database.SaveChangesAsync();
+				database.SaveChanges();
 				return userLogin;
-
 			}
 			else
 			{
