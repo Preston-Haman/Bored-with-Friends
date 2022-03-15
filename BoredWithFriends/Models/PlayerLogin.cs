@@ -18,7 +18,6 @@ namespace BoredWithFriends.Models
 		[ForeignKey(nameof(PlayerID))]
 		public PlayerStatistics PlayerStatisticsID { get; set; } = null!;
 
-		
 		public string UserName { get; set; } = null!;
 
 		public string Password { get; set; } = null!;
@@ -29,6 +28,5 @@ namespace BoredWithFriends.Models
 		{
 			LastLoginTime = DateTime.Now;
 		}
-
 	}
 }

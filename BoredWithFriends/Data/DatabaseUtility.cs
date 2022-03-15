@@ -72,8 +72,8 @@ namespace BoredWithFriends.Data
 			};
 
 			using DatabaseContext database = new();
-			database.AddAsync(newUser);
-			database.SaveChanges(); //Can't do an async call because we need the PlayerID.
+			database.Add(newUser);
+			database.SaveChanges();
 			return newUser.PlayerID;
 		}
 
@@ -96,9 +96,8 @@ namespace BoredWithFriends.Data
 				Player user = new(userLogin.PlayerID, userLogin.UserName);
 
 				userLogin.SetLastLoginToNow();
-				database.SaveChangesAsync();
+				database.SaveChanges();
 				return userLogin;
-
 			}
 			else
 			{
@@ -182,7 +181,7 @@ namespace BoredWithFriends.Data
 
 			using DatabaseContext database = new();
 			database.Update(user);
-			database.SaveChangesAsync();
+			database.SaveChanges();
 		}
 
 		/// <summary>
@@ -205,7 +204,7 @@ namespace BoredWithFriends.Data
 			{
 				userLogin.Password = newPassword;
 				database.Update(userLogin);
-				database.SaveChangesAsync();
+				database.SaveChanges();
 				return true;
 			}
 			return false;
@@ -223,7 +222,7 @@ namespace BoredWithFriends.Data
 
 			database.Remove(user);
 			database.Remove(userStatistics);
-			database.SaveChangesAsync();
+			database.SaveChanges();
 		}
 
 		/// <summary>
@@ -257,7 +256,7 @@ namespace BoredWithFriends.Data
 
 			using DatabaseContext database = new();
 			database.Update(userStats);
-			database.SaveChangesAsync();
+			database.SaveChanges();
 		}
 
 		/// <summary>
@@ -272,7 +271,7 @@ namespace BoredWithFriends.Data
 
 			using DatabaseContext database = new();
 			database.Update(userStats);
-			database.SaveChangesAsync();
+			database.SaveChanges();
 			
 		}
 
@@ -293,7 +292,7 @@ namespace BoredWithFriends.Data
 
 			using DatabaseContext database = new();
 			database.Update(userStats);
-			database.SaveChangesAsync();
+			database.SaveChanges();
 
 		}
 	}
