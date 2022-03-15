@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BoredWithFriends.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -282,8 +283,7 @@ namespace BoredWithFriends.Games
 			Winners.Add(player);
 			if (!player.IsGuest)
 			{
-				//TODO: Call database code that adds a win to this player's stats.
-
+				DatabaseContext.AddWin(player);
 			}
 		}
 
@@ -311,8 +311,7 @@ namespace BoredWithFriends.Games
 			Losers.Add(player);
 			if (!player.IsGuest)
 			{
-				//TODO: Call database code that adds a loss to this player's stats.
-
+				DatabaseContext.AddLoss(player);
 			}
 		}
 
