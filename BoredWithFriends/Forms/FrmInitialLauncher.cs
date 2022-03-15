@@ -102,7 +102,10 @@ namespace BoredWithFriends.Forms
 			{
 				Server.StartServer(); //Local server
 				Server.LocalGameState = generalGameState;
-				Server.AddPlayerConnection(new LocalConnection(player));
+				if (player.IsGuest)
+				{
+					Server.AddPlayerConnection(new LocalConnection(player));
+				}
 			}
 			else
 			{
