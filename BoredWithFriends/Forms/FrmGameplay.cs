@@ -33,6 +33,7 @@ namespace BoredWithFriends.Forms
 		{
 			InitializeComponent();
 			this.ApplyGeneralTheme();
+			StartPosition = FormStartPosition.CenterScreen;
 
 			Client.GeneralEvents += GeneralEventHandler;
 		}

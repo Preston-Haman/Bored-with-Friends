@@ -9,10 +9,13 @@ namespace BoredWithFriends.Forms
 {
 	public partial class FrmInitialLauncher : Form
 	{
+		private bool accountCreationIsOpen = false;
+
 		public FrmInitialLauncher()
 		{
 			InitializeComponent();
 			this.ApplyGeneralTheme();
+			StartPosition = FormStartPosition.CenterScreen;
 
 			Client.GeneralEvents += GeneralEventHandler;
 
@@ -47,6 +50,8 @@ namespace BoredWithFriends.Forms
 				return;
 			}
 
+			accountCreationIsOpen = true;
+			frmAccountCreation.Closed += (s, args) => { accountCreationIsOpen = false; };
 			frmAccountCreation.ShowDialog();
 		}
 
@@ -56,11 +61,16 @@ namespace BoredWithFriends.Forms
 			{
 				//Local server
 				Server.StartServer();
-				BasePacket.RunLocally(new ClientLogin(txtUsername.Text, txtPassword.Text), new LocalClientConnection());
+				PacketSendUtility.SendLocalPacket(new LocalClientConnection(), new ClientLogin(txtUsername.Text, txtPassword.Text));
+			}
+			else if (IPAddress.TryParse(txtServerIP.Text, out IPAddress? _) && int.TryParse(txtPort.Text, out int port))
+			{
+				Client.StartClient(txtServerIP.Text, int.Parse(txtPort.Text));
 			}
 			else
 			{
-				Client.StartClient(txtServerIP.Text, int.Parse(txtPort.Text));
+				MessageBox.Show(this, "Please double check your server IP and port input.", "Internal Error:", MessageBoxButtons.OK);
+				return;
 			}
 		}
 
@@ -111,10 +121,10 @@ namespace BoredWithFriends.Forms
 				case GeneralEvent.ConnectionFailed:
 					string msg = "The server did not respond. Please verify that the IP and port information" +
 						"is correct, and that the server is online, then try again.";
-					MessageBox.Show(this, msg, "Connection Error:", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+					MessageBox.Show(msg, "Connection Error:", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 					break;
 				case GeneralEvent.LoginReady:
-					PacketSendUtility.SendPacket(new ClientLogin(txtUsername.Text, txtPassword.Text));
+					PacketSendUtility.SendPacket(new ClientLogin(txtUsername.Text, txtPassword.Text, accountCreationIsOpen));
 					break;
 				case GeneralEvent.LoginFailedInvalidCredentials:
 					string msg2 = "Your login credentials were not recognized; please double check that you" +

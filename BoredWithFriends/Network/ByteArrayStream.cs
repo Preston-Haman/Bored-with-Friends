@@ -80,13 +80,13 @@ namespace BoredWithFriends.Network
 		/// The position of this stream.
 		/// <br></br><br></br>
 		/// The position is the current location within the internal buffer of data where calls
-		/// to read or write will read or write from. As data is written from this stream, the
+		/// to read or write will read or write at. As data is written from this stream, the
 		/// position is moved forward; the same is true when data is read from this stream.
 		/// <br></br><br></br>
-		/// It's worth noting that if a caller plan to both write to and read from this stream,
+		/// It's worth noting that if a caller plans to both write to and read from this stream,
 		/// they will have to reposition the stream as necessary for their use. To read the
 		/// entirety of the data that was previously written to this stream, set the position
-		/// to zero.
+		/// to zero. Callers may also overwrite previously written data by changing the position.
 		/// </summary>
 		public int Position
 		{

@@ -39,8 +39,7 @@ namespace BoredWithFriends.Network.Packets
 		public ConnectionState ValidState { get; }
 
 		/// <summary>
-		/// Marks the using class as an implementation of <see cref="BasePacket"/>. You must also
-		/// declare <see cref="ProtocolAttribute"/> and <see cref="OpcodeAttribute"/>.
+		/// Marks the using class as an implementation of <see cref="BasePacket"/>.
 		/// </summary>
 		/// <param name="classType">The <see cref="Type"/> of the class using this attribute.</param>
 		/// <param name="protocol">The <see cref="BoredWithFriendsProtocol"/> the packet is for.</param>

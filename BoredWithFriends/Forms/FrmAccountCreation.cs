@@ -54,7 +54,7 @@ namespace BoredWithFriends.Forms
 				{
 					//Local server
 					Server.StartServer();
-					BasePacket.RunLocally(new ClientLogin(userName, password, true), new LocalClientConnection());
+					PacketSendUtility.SendLocalPacket(new LocalClientConnection(), new ClientLogin(userName, password, true));
 				}
 				else
 				{
@@ -112,14 +112,6 @@ namespace BoredWithFriends.Forms
 		{
 			switch (genEvent)
 			{
-				case GeneralEvent.ConnectionFailed:
-					string msg = "The server did not respond. Please verify that the IP and port information" +
-						"is correct, and that the server is online, then try again.";
-					MessageBox.Show(this, msg, "Connection Error:", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-					break;
-				case GeneralEvent.LoginReady:
-					PacketSendUtility.SendPacket(new ClientLogin(txtUserName.Text, txtPassword.Text, true));
-					break;
 				case GeneralEvent.LoginFailedUsernameNotAvailable:
 					lblWarningInvalidName.Text = "This username has been taken";
 					break;

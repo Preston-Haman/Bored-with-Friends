@@ -26,8 +26,8 @@ namespace BoredWithFriends.Controls
 			{
 				localMode = value;
 				btnAddPlayer.Enabled = value;
-				playerListPanel1.LocalMode = value;
-				playerListPanel2.LocalMode = value;
+				ctrlPlayerPanel.LocalMode = value;
+				ctrlSpectatorPanel.LocalMode = value;
 			}
 		}
 
@@ -40,11 +40,11 @@ namespace BoredWithFriends.Controls
 		{
 			if (spectator)
 			{
-				playerListPanel2.AddPlayer(players);
+				ctrlSpectatorPanel.AddPlayer(players);
 			}
 			else
 			{
-				playerListPanel1.AddPlayer(players);
+				ctrlPlayerPanel.AddPlayer(players);
 			}
 		}
 
@@ -52,23 +52,23 @@ namespace BoredWithFriends.Controls
 		{
 			if (spectator)
 			{
-				playerListPanel2.RemovePlayer(player);
+				ctrlSpectatorPanel.RemovePlayer(player);
 			}
 			else
 			{
-				playerListPanel1.RemovePlayer(player);
+				ctrlPlayerPanel.RemovePlayer(player);
 			}
 		}
 
 		public void SetActivePlayer(Player player)
 		{
-			playerListPanel1.SetActivePlayer(player);
+			ctrlPlayerPanel.SetActivePlayer(player);
 		}
 
 		public void Clear()
 		{
-			playerListPanel1.Clear();
-			playerListPanel2.Clear();
+			ctrlPlayerPanel.Clear();
+			ctrlSpectatorPanel.Clear();
 		}
 	}
 }

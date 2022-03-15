@@ -33,10 +33,6 @@ namespace BoredWithFriends.Network
 		/// <summary>
 		/// Constructs a new <see cref="ClientNetworkHandler"/>. Call
 		/// <see cref="ConnectToServer"/> to connect to a remote server.
-		/// <br></br><br></br>
-		/// Note that calls to <see cref="NetworkHandler.Start"/> will
-		/// start the dispatch thread of the base implementation even
-		/// if there i
 		/// </summary>
 		public ClientNetworkHandler() : base("Client")
 		{
@@ -50,7 +46,8 @@ namespace BoredWithFriends.Network
 
 		/// <summary>
 		/// For <see cref="ClientNetworkHandler"/>, this will only start
-		/// the dispatch thread after a connection has been established.
+		/// the dispatch thread after a connection has been established
+		/// (see <seealso cref="ConnectToServer"/>).
 		/// <br></br><br></br>
 		/// <inheritdoc/>
 		/// </summary>
@@ -165,7 +162,7 @@ namespace BoredWithFriends.Network
 	/// <br></br><br></br>
 	/// When this implementation is told to run in local mode, it will bind to
 	/// the machine's loopback address. When not in local mode, it will listen
-	/// on all available interfaces. In either case, port 7777 is used.
+	/// on all available interfaces. In either case, port 7777 is used by default.
 	/// </summary>
 	internal class ServerNetworkHandler : NetworkHandler
 	{
@@ -289,12 +286,17 @@ namespace BoredWithFriends.Network
 		/// <exception cref="ArgumentException">If <paramref name="con"/> is not a <see cref="LocalConnection"/></exception>
 		public override void SendPacket(Connection con, BasePacket packet)
 		{
-			if (con is not LocalConnection localCon)
+			if (con is LocalConnection localCon)
 			{
-				throw new ArgumentException($"The connection must be a local connection for {nameof(LocalNetworkHandler)}.", nameof(con));
+				BasePacket.RunLocally(packet, localCon);
 			}
 
-			BasePacket.RunLocally(packet, localCon);
+			if (con is LocalClientConnection localClientCon)
+			{
+				BasePacket.RunLocally(packet, localClientCon);
+			}
+			
+			throw new ArgumentException($"The connection must be a local connection for {nameof(LocalNetworkHandler)}.", nameof(con));
 		}
 	}
 
@@ -383,7 +385,7 @@ namespace BoredWithFriends.Network
 		/// It is used to name the thread as if by
 		/// <code>Thread.Name = $"{<paramref name="handlerName"/>} Read/Write Dispatcher"</code>
 		/// </summary>
-		/// <param name="handlerName"></param>
+		/// <param name="handlerName">The name of this handler that will be appended to the Dispatch Thread's name.</param>
 		public NetworkHandler(string handlerName)
 		{
 			this.handlerName = handlerName;

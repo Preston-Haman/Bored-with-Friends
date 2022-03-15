@@ -422,8 +422,8 @@ namespace BoredWithFriends.Games
 		/// is competing in this game, they will forfeit the match if <see cref="tokenPlayCount"/>
 		/// is greater than one.
 		/// </summary>
-		/// <param name="player"></param>
-		/// <param name="spectator"></param>
+		/// <param name="player">The <see cref="Player"/> leaving the game.</param>
+		/// <param name="spectator">Whether or not <paramref name="player"/> is a spectator.</param>
 		public override void PlayerLeaves(Player player, bool spectator = false)
 		{
 			if (!spectator && tokenPlayCount > 1)

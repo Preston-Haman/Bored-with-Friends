@@ -119,6 +119,24 @@ namespace BoredWithFriends.Network
 		}
 
 		/// <summary>
+		/// Runs the given packet locally using the given <paramref name="con"/>.
+		/// <br></br><br></br>
+		/// This method is meant for handling local login packets, as the connection process for
+		/// local games is different than that of online games.
+		/// </summary>
+		/// <param name="con">The "unidentified" local connection to run this packet with.</param>
+		/// <param name="packet">The packet to run.</param>
+		public static void SendLocalPacket(LocalClientConnection con, ClientPacket packet)
+		{
+			if (NetHandler is LocalNetworkHandler)
+			{
+				NetHandler.SendPacket(con, packet);
+				return;
+			}
+			throw new InvalidOperationException("Cannot send local packets while not operating in local mode.");
+		}
+
+		/// <summary>
 		/// Uses a <see cref="LocalConnection"/> to "send" the packet out to the <see cref="NetHandler"/>;
 		/// this will result in problems if the <see cref="NetHandler"/> is not a <see cref="LocalNetworkHandler"/>.
 		/// </summary>

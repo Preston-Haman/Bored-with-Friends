@@ -18,7 +18,7 @@ namespace BoredWithFriends.Data
 		/// <br></br><br></br>
 		/// If <paramref name="createNew"/> is true:<br></br>
 		/// An attempt will be made to create a new Player in the database, if it succeeds the new
-		/// player's playerID will be returned.
+		/// player's playerID will be output, and true will be returned.
 		/// <br></br><br></br>
 		/// if <paramref name="createNew"/> is false:<br></br>
 		/// An attempt to identify the given credentials as an existing user will be made. If the
@@ -228,11 +228,11 @@ namespace BoredWithFriends.Data
 
 		/// <summary>
 		/// Checks if the given <paramref name="password"/> matches the password on record for
-		/// the given <paramref name="player"/>, and delete's the player's account if so. If the
+		/// the given <paramref name="player"/>, and deletes the player's account if so. If the
 		/// account has been deleted, true is returned; false otherwise.
 		/// </summary>
-		/// <param name="player"></param>
-		/// <param name="password"></param>
+		/// <param name="player">The <see cref="Player"/> assigned to the account to delete.</param>
+		/// <param name="password">The current password for the account.</param>
 		/// <returns>True if the player's account was deleted; false otherwise.</returns>
 		public static bool DeleteUser(Player player, string password)
 		{

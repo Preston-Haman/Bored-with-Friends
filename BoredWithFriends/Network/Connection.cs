@@ -43,7 +43,7 @@ namespace BoredWithFriends.Network
 		/// Returns the underlying TcpClient this Connection uses,
 		/// and considers this connection to be closed.
 		/// <br></br><br></br>
-		/// <seealso cref="isAdopted"/>
+		/// See <seealso cref="isAdopted"/>.
 		/// </summary>
 		/// <returns>The underlying TcpClient this connection uses.</returns>
 		public virtual TcpClient AdoptClient()
@@ -212,7 +212,7 @@ namespace BoredWithFriends.Network
 	/// <summary>
 	/// A base class for connections; this class and subclasses are responsible for handling
 	/// the network.
-	/// 
+	/// <br></br><br></br>
 	/// This class is being created as part of a student assignment with a get-it-to-work approach,
 	/// and is not recommended for use outside of this project.
 	/// </summary>
@@ -347,7 +347,7 @@ namespace BoredWithFriends.Network
 				int offset = 0;
 				do
 				{
-					offset += client.GetStream().Read(bytes, offset, byteCount);
+					offset += client.GetStream().Read(bytes, offset, byteCount - offset);
 				} while (offset < byteCount);
 				
 				return true;

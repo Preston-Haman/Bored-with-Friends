@@ -61,19 +61,14 @@ namespace BoredWithFriends.Games
 			set
 			{
 				gameHasStarted = value;
-				Player? currentPlayer = null;
 				try
 				{
-					currentPlayer = GetCurrentPlayer();
+					Player currentPlayer = GetCurrentPlayer();
+					generalGameGui.UpdateActivePlayer(this, currentPlayer);
 				}
 				catch (Exception)
 				{
 					//Ignore; this game doesn't have turns.
-				}
-
-				if (currentPlayer is not null)
-				{
-					generalGameGui.UpdateActivePlayer(this, currentPlayer);
 				}
 			}
 		}
@@ -196,7 +191,8 @@ namespace BoredWithFriends.Games
 		/// <see cref="Players"/> or <see cref="Spectators"/> based on the value
 		/// of <paramref name="spectator"/>.
 		/// </summary>
-		/// <param name="player"></param>
+		/// <param name="player">The <see cref="Player"/> leaving the game.</param>
+		/// <param name="spectator">Whether or not <paramref name="player"/> is a spectator.</param>
 		public virtual void PlayerLeaves(Player player, bool spectator = false)
 		{
 			//Might have to do this based on how Remove works...

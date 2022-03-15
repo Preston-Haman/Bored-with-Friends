@@ -4,6 +4,7 @@
 	/// An interface of callback methods intended for the GUI consumer of a <see cref="GameState"/>.
 	/// <br></br><br></br>
 	/// The methods of this interface are as follows:<br></br>
+	/// <list type="bullet"><see cref="GameStateChanged"/></list>
 	/// <list type="bullet"><see cref="AddPlayer"/></list>
 	/// <list type="bullet"><see cref="RemovePlayer"/></list>
 	/// <list type="bullet"><see cref="UpdateActivePlayer"/></list>

@@ -1,5 +1,6 @@
 ﻿using BoredWithFriends.Network.Packets;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace BoredWithFriends.Games
 	{
 		public readonly BoredWithFriendsProtocol game;
 
-		public readonly Queue<Player> players = new();
+		public readonly ConcurrentQueue<Player> players = new();
 
 		public LobbyGameState(BoredWithFriendsProtocol game, IGeneralGameGui generalGameGui) : base(generalGameGui)
 		{
