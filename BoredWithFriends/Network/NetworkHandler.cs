@@ -289,11 +289,13 @@ namespace BoredWithFriends.Network
 			if (con is LocalConnection localCon)
 			{
 				BasePacket.RunLocally(packet, localCon);
+				return;
 			}
 
 			if (con is LocalClientConnection localClientCon)
 			{
 				BasePacket.RunLocally(packet, localClientCon);
+				return;
 			}
 			
 			throw new ArgumentException($"The connection must be a local connection for {nameof(LocalNetworkHandler)}.", nameof(con));
