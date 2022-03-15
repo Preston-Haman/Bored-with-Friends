@@ -8,15 +8,15 @@ vertically, horizantally, or diagonally wins. You can play hot seat with your fr
 - Online Multiplayer
 - Local and/or Online Score Board
 
-## Getting Started w/ Visual Studio
+## Getting Started
 - Download [VS2022](https://visualstudio.microsoft.com/vs/) with the **.NET Entity Framework 6 Workload**
 - Clone the repo and build the project.
 - Run **Update-Database** in the Package Manager Console to run the script that creates the database.
 
-## Getting started with Entity Framework Core
+## Information on setting up and using Entity Framework Core
 - Installing EF Core [here.](https://docs.microsoft.com/en-us/ef/core/get-started/overview/install)
 - Some basics of using Entity Framework Core [here.](https://docs.microsoft.com/en-us/ef/core/get-started/overview/first-app?tabs=netcore-cli)
-- A great overview of how our code first database migration, DbContext, works [here.](https://docs.microsoft.com/en-us/ef/core/dbcontext-configuration/)
+- An overview of the code first database migration process [here.](https://docs.microsoft.com/en-us/ef/core/dbcontext-configuration/)
 
 ## Screen Shots
 ![The main menu](Screenshots/InitialMenu.png) ![A Match Four game](Screenshots/MatchFourGame.png)
